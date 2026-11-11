@@ -19,6 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
+import { cerrarFrase } from '../../../../../../shared/domain/frases';
 import { ErrorHttp, TipoErrorHttp } from '../../../../../../shared/domain/errors/error-http';
 import { EncabezadoFichaComponent } from '../../../../../../shared/infrastructure/fichas/encabezado-ficha.component';
 import { obligatorio } from '../../../../../../shared/infrastructure/formularios/validadores';
@@ -125,7 +126,9 @@ export class NuevoUsuarioComponent {
   });
   protected readonly detalle = computed(() => {
     const empresa = this.nombreEmpresa();
-    return `Se crea con una contraseña temporal y al menos un rol en ${empresa ?? 'esta empresa'}.`;
+    return cerrarFrase(
+      `Se crea con una contraseña temporal y al menos un rol en ${empresa ?? 'esta empresa'}`,
+    );
   });
 
   protected readonly registrando = signal(false);

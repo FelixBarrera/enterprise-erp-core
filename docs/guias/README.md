@@ -6,7 +6,7 @@ Aquí se guarda el avance del proyecto. **Es la memoria del proyecto**: después
 
 | Paso | Qué | Estado | Guía |
 |---|---|---|---|
-| 1 a 6 | La base: esqueleto, reglas y documentación, base del sistema, empresas, login, roles y permisos, administración y bitácora | ✅ Vienen hechos con la plantilla (`base-v6`; revisada por los 14 roles: `docs/modulos/auth-usuarios.md`, secciones 12 y 13) | (las guías de esos pasos quedaron en el proyecto de origen) |
+| 1 a 6 | La base: esqueleto, reglas y documentación, base del sistema, empresas, login, roles y permisos, administración y bitácora | ✅ Vienen hechos con la plantilla (`base-v7`; revisada por los 14 roles: `docs/modulos/auth-usuarios.md`, secciones 12 y 13) | (las guías de esos pasos quedaron en el proyecto de origen) |
 | 0 | Crear el proyecto desde la plantilla (`./nuevo-proyecto.sh`) | ⏳ | |
 | 7 | Reglas de negocio de este proyecto | ⏳ | |
 

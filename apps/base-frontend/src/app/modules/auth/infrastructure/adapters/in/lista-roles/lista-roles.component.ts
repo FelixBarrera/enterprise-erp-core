@@ -10,6 +10,7 @@ import {
   CELULAR,
   segunPantalla,
 } from '../../../../../../shared/infrastructure/layout/pantalla-chica';
+import { cerrarFrase } from '../../../../../../shared/domain/frases';
 import { IconoComponent } from '../../../../../../shared/infrastructure/layout/icono/icono.component';
 import { USUARIO_CABECERA } from '../../../../../../shared/infrastructure/layout/usuario-cabecera';
 import { BarraCargaComponent } from '../../../../../../shared/infrastructure/listados/barra-carga/barra-carga.component';
@@ -71,6 +72,10 @@ export class ListaRolesComponent {
   });
   protected readonly enCelular = segunPantalla(CELULAR);
   protected readonly nombreEmpresa = inject(USUARIO_CABECERA).nombreEmpresa;
+  protected readonly subtitulo = computed(() => {
+    const empresa = this.nombreEmpresa();
+    return cerrarFrase(`Qué puede hacer cada grupo de personas${empresa ? ` en ${empresa}` : ''}`);
+  });
 
   protected readonly opcionesEstado = OPCIONES_ESTADO;
   protected readonly largoBusqueda = LARGO_MAXIMO_BUSQUEDA_ROL;
