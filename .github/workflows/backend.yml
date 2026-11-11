@@ -1,0 +1,114 @@
+# CI del backend: corre solo si cambian archivos del backend o de la raíz.
+# Acciones fijadas por SHA (el comentario dice la versión). Las actualiza Dependabot.
+name: Backend
+
+on:
+  pull_request:
+    paths:
+      - 'apps/base-backend/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.nvmrc'
+      - '.github/workflows/backend.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/base-backend/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.nvmrc'
+      - '.github/workflows/backend.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Lint, tipos, pruebas y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Valores de prueba (no son secretos reales).
+    env:
+      NODE_ENV: test
+      PORT: 3000
+      DATABASE_URL: postgresql://base_erp:base_erp_ci@localhost:5432/base_erp_ci
+      REDIS_URL: redis://localhost:6379
+      CORS_ORIGINS: http://localhost:4200
+      TRUST_PROXY: false
+      LOG_LEVEL: info
+      ZONA_NEGOCIO: America/Guayaquil
+      # Solo para el CI (no es de ninguna instalación); el de cada una se genera al instalar.
+      JWT_SECRETO: secreto-del-ci-solo-para-pruebas-no-usar-en-ninguna-instalacion-0123456789
+      SESION_DURACION_MAXIMA_HORAS: 13
+      SESION_INACTIVIDAD_MINUTOS: 120
+      LIMITE_LOGIN_POR_MINUTO: 10
+      LIMITE_USUARIO_POR_MINUTO: 300
+      LIMITE_IP_POR_MINUTO: 60
+      # Solo para admin:crear-inicial (las pruebas no las usan; vacías como en .env.example).
+      EMPRESA_INICIAL_NOMBRE: ''
+      ADMIN_INICIAL_USUARIO: ''
+      ADMIN_INICIAL_NOMBRE: ''
+      ADMIN_INICIAL_CONTRASENA: ''
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: base_erp
+          POSTGRES_PASSWORD: base_erp_ci
+          POSTGRES_DB: base_erp_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U base_erp -d base_erp_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Generar el cliente de Prisma
+        run: pnpm --filter base-backend exec prisma generate
+
+      - name: Aplicar migraciones
+        run: pnpm --filter base-backend exec prisma migrate deploy
+
+      - name: Lint
+        run: pnpm --filter base-backend lint
+
+      - name: Revisión de tipos
+        run: pnpm --filter base-backend exec tsc --noEmit
+
+      - name: Pruebas unitarias con cobertura
+        run: pnpm --filter base-backend test:cov
+
+      - name: Pruebas e2e
+        run: pnpm --filter base-backend test:e2e
+
+      - name: Compilación
+        run: pnpm --filter base-backend build

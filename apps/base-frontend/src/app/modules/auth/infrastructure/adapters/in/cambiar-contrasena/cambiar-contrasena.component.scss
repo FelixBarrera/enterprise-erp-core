@@ -1,0 +1,286 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+}
+
+// ── Con la contraseña temporal: la página entera, sin menú ──────────────────────────────────────
+:host:has(.cambio--temporal) {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-fondo);
+}
+
+.cabecera-sola {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+
+  @media (max-width: 599.98px) {
+    height: 60px;
+    padding: 0 16px;
+  }
+}
+
+.cabecera-sola__salir app-icono {
+  margin-right: 8px;
+}
+
+.cambio--temporal {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
+  outline: none;
+
+  @media (max-width: 599.98px) {
+    padding: 24px 16px;
+  }
+}
+
+// ── El formulario y la ayuda, lado a lado (una debajo de la otra si no caben) ───────────────────
+.cambio__columnas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+  max-width: 880px;
+}
+
+.cambio__tarjeta {
+  flex: 1 1 440px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 32px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-tarjeta);
+
+  @media (max-width: 599.98px) {
+    flex-basis: 100%;
+    padding: 24px 20px;
+  }
+}
+
+.cambio__sello {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--estado-aviso-fondo);
+  color: var(--estado-aviso);
+}
+
+.cambio__titulo {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+
+  @media (max-width: 599.98px) {
+    font-size: 22px;
+  }
+}
+
+.cambio__explicacion {
+  margin: 0 0 28px;
+  color: var(--color-texto-secundario);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.cambio__subtitulo {
+  margin: 0 0 20px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+// Campos y botón como los del login: la misma pieza de la sesión.
+.cambio__formulario {
+  @include mat.form-field-overrides(
+    (
+      container-height: 46px,
+      container-text-size: 15px,
+    )
+  );
+  @include mat.button-overrides(
+    (
+      filled-container-height: 48px,
+      filled-label-text-size: 15px,
+      outlined-container-height: 48px,
+      outlined-label-text-size: 15px,
+    )
+  );
+
+  @media (max-width: 599.98px) {
+    @include mat.form-field-overrides(
+      (
+        container-text-size: 16px,
+      )
+    );
+  }
+}
+
+.campo {
+  margin-bottom: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+// ── Barra de fuerza: cuatro rayitas, del rojo al verde (más el texto: no solo color) ────────────
+.fuerza {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--color-borde);
+
+  &[data-nivel='1'] {
+    color: var(--estado-peligro);
+  }
+
+  &[data-nivel='2'] {
+    color: var(--estado-aviso);
+  }
+
+  &[data-nivel='3'] {
+    color: var(--color-primario);
+  }
+
+  &[data-nivel='4'] {
+    color: var(--estado-exito);
+  }
+}
+
+.fuerza__raya {
+  height: 4px;
+  border-radius: 4px;
+  background: var(--color-borde);
+
+  &--llena {
+    background: currentcolor;
+  }
+}
+
+.fuerza__texto {
+  margin: 6px 0 0;
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+}
+
+.cambio__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cambio__guardar {
+  flex: 1 1 200px;
+  box-shadow: var(--sombra-boton);
+}
+
+.cambio__cancelar {
+  flex: 0 1 140px;
+
+  @media (max-width: 599.98px) {
+    flex-basis: 100%;
+  }
+}
+
+// ── Ayuda: cómo debe ser la contraseña ──────────────────────────────────────────────────────────
+.cambio__ayuda {
+  display: flex;
+  flex: 1 1 300px;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.reglas {
+  padding: 24px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-superficie);
+}
+
+.reglas__titulo {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.reglas__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.regla {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.45;
+}
+
+.regla__marca {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--estado-neutro-fondo);
+  color: var(--color-texto-tenue);
+}
+
+.regla--cumplida .regla__marca {
+  background: var(--estado-exito-fondo);
+  color: var(--estado-exito);
+}
+
+.regla--informativa {
+  color: var(--color-texto-secundario);
+}
+
+.reglas__nota {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-borde-suave);
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cambio__sesiones {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-primario-suave);
+  color: var(--color-primario-oscuro);
+  font-size: 14px;
+  line-height: 1.5;
+
+  app-icono {
+    flex: none;
+    margin-top: 1px;
+  }
+}

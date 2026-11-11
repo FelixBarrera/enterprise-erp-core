@@ -1,0 +1,250 @@
+<app-barra-carga [activa]="listado.cargando()" />
+
+<header class="encabezado-pagina">
+  <div>
+    <h1 class="titulo-pagina">Usuarios</h1>
+    @if (!enCelular()) {
+      <p class="subtitulo-pagina">
+        Las personas que entran{{ nombreEmpresa() ? ' a ' + nombreEmpresa() : '' }} y sus roles
+        aquí.
+      </p>
+    }
+  </div>
+  <a *appConPermiso="'auth.usuario.crear'" matButton="filled" routerLink="nuevo">
+    <app-icono nombre="agregar" [tamano]="18" />
+    Nuevo usuario
+  </a>
+</header>
+
+@if (enCelular()) {
+  <div class="lista-usuarios__buscador-celular">
+    <mat-form-field subscriptSizing="dynamic" class="lista-usuarios__buscar">
+      <app-icono matPrefix class="lista-usuarios__lupa" nombre="buscar" [tamano]="16" />
+      <input
+        matInput
+        type="search"
+        aria-label="Buscar usuario"
+        placeholder="Nombre o usuario"
+        autocomplete="off"
+        [maxLength]="largoBusqueda"
+        [value]="filtros().texto"
+        (input)="buscar($event)"
+      />
+    </mat-form-field>
+    <button
+      matButton="outlined"
+      type="button"
+      class="lista-usuarios__boton-filtros"
+      [attr.aria-expanded]="verFiltros()"
+      aria-controls="usuarios-filtros"
+      [attr.aria-label]="
+        listado.filtrosActivos() > 0
+          ? 'Filtros: ' +
+            listado.filtrosActivos() +
+            (listado.filtrosActivos() === 1 ? ' activo' : ' activos')
+          : 'Filtros'
+      "
+      (click)="alternarFiltros()"
+    >
+      <app-icono nombre="filtros" [tamano]="18" />
+      @if (listado.filtrosActivos() > 0) {
+        <span class="lista-usuarios__burbuja" aria-hidden="true">{{
+          listado.filtrosActivos()
+        }}</span>
+      }
+    </button>
+  </div>
+  @if (verFiltros()) {
+    <section
+      id="usuarios-filtros"
+      class="tarjeta lista-usuarios__filtros-celular"
+      aria-label="Filtros"
+    >
+      <ng-container [ngTemplateOutlet]="filtroRol" />
+      <ng-container [ngTemplateOutlet]="filtroEstado" />
+      @if (listado.filtrosActivos() > 0) {
+        <button matButton type="button" (click)="listado.limpiarFiltros()">Limpiar filtros</button>
+      }
+    </section>
+  }
+
+  <ul class="lista-tarjetas" aria-label="Lista de usuarios">
+    @for (usuario of usuarios(); track usuario.id) {
+      <li>
+        <a class="tarjeta-fila" [routerLink]="[usuario.id]">
+          <span class="iniciales iniciales--grande" aria-hidden="true">{{
+            iniciales(usuario.nombreCompleto)
+          }}</span>
+          <span class="tarjeta-fila__cuerpo">
+            <span class="tarjeta-fila__titulo">
+              {{ usuario.nombreCompleto }}
+              @for (estado of estados(usuario); track estado.texto) {
+                <span class="estado" [class]="'estado--' + estado.tipo">{{ estado.texto }}</span>
+              }
+            </span>
+            <span class="tarjeta-fila__secundario">{{ usuario.nombreUsuario }}</span>
+            <span class="tarjeta-fila__secundario">{{ textoRoles(usuario.roles) }}</span>
+          </span>
+          <app-icono nombre="siguiente" [tamano]="18" />
+        </a>
+      </li>
+    }
+  </ul>
+  <app-estado-lista
+    [listado]="listado"
+    vacio="No hay usuarios."
+    vacioConFiltros="Ningún usuario coincide con los filtros."
+  />
+  <app-paginador [listado]="listado" />
+} @else {
+  <section class="tarjeta lista-usuarios__filtros" aria-labelledby="usuarios-titulo-filtros">
+    <div class="tarjeta__cabecera">
+      <div class="lista-usuarios__titulo-filtros">
+        <h2 id="usuarios-titulo-filtros" class="tarjeta__titulo">Filtros</h2>
+        @if (listado.filtrosActivos() > 0) {
+          <span class="contador">
+            {{ listado.filtrosActivos() }}
+            {{ listado.filtrosActivos() === 1 ? 'activo' : 'activos' }}
+          </span>
+        }
+      </div>
+    </div>
+    <div class="lista-usuarios__campos">
+      <div class="lista-usuarios__campo-buscar">
+        <label class="etiqueta" for="usuarios-buscar">Buscar</label>
+        <mat-form-field subscriptSizing="dynamic">
+          <app-icono matPrefix class="lista-usuarios__lupa" nombre="buscar" [tamano]="16" />
+          <input
+            matInput
+            id="usuarios-buscar"
+            type="search"
+            placeholder="Nombre o usuario"
+            autocomplete="off"
+            [maxLength]="largoBusqueda"
+            [value]="filtros().texto"
+            (input)="buscar($event)"
+          />
+        </mat-form-field>
+      </div>
+      <ng-container [ngTemplateOutlet]="filtroRol" />
+      <ng-container [ngTemplateOutlet]="filtroEstado" />
+      @if (listado.filtrosActivos() > 0) {
+        <button matButton type="button" (click)="listado.limpiarFiltros()">Limpiar filtros</button>
+      }
+    </div>
+  </section>
+
+  <section class="tarjeta tarjeta--tabla" aria-label="Lista de usuarios">
+    <table mat-table [dataSource]="usuarios()">
+      <ng-container matColumnDef="usuario">
+        <th mat-header-cell *matHeaderCellDef>Usuario</th>
+        <td mat-cell *matCellDef="let usuario">
+          <span class="lista-usuarios__usuario">
+            <span class="iniciales iniciales--grande" aria-hidden="true">{{
+              iniciales(usuario.nombreCompleto)
+            }}</span>
+            <span class="celda-doble">
+              <a class="lista-usuarios__nombre" [routerLink]="[usuario.id]">{{
+                usuario.nombreCompleto
+              }}</a>
+              <span class="celda-doble__secundario">{{ usuario.nombreUsuario }}</span>
+            </span>
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="roles">
+        <th mat-header-cell *matHeaderCellDef>Roles</th>
+        <td mat-cell *matCellDef="let usuario">
+          <span class="lista-usuarios__roles">
+            @for (rol of usuario.roles; track rol.id) {
+              <span
+                class="lista-usuarios__rol"
+                [class.lista-usuarios__rol--administrador]="rol.esAdministrador"
+                [class.lista-usuarios__rol--desactivado]="!rol.activo"
+                >{{ textoRol(rol) }}</span
+              >
+            }
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="ingreso">
+        <th mat-header-cell *matHeaderCellDef>Último ingreso</th>
+        <td mat-cell *matCellDef="let usuario">
+          @if (usuario.ultimoIngresoEn) {
+            <span class="numero">{{ usuario.ultimoIngresoEn | fechaHora }}</span>
+          } @else {
+            <span class="lista-usuarios__nunca">{{ sinIngreso }}</span>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let usuario">
+          <span class="lista-usuarios__estados">
+            @for (estado of estados(usuario); track estado.texto) {
+              <span class="estado" [class]="'estado--' + estado.tipo">{{ estado.texto }}</span>
+            }
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="abrir">
+        <th mat-header-cell *matHeaderCellDef class="lista-usuarios__abrir">
+          <span class="oculto-visual">Abrir</span>
+        </th>
+        <td mat-cell *matCellDef="let usuario" class="lista-usuarios__abrir">
+          <app-icono nombre="siguiente" [tamano]="18" />
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let usuario; columns: columnas"
+        class="lista-usuarios__fila"
+        (click)="abrir(usuario, $event)"
+      ></tr>
+    </table>
+    <app-estado-lista
+      [listado]="listado"
+      vacio="No hay usuarios."
+      vacioConFiltros="Ningún usuario coincide con los filtros."
+    />
+    <app-paginador [listado]="listado" />
+  </section>
+}
+
+<ng-template #filtroRol>
+  <div class="lista-usuarios__campo-filtro">
+    <label class="etiqueta" id="usuarios-rol-etiqueta" for="usuarios-rol">Rol</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-select
+        id="usuarios-rol"
+        aria-labelledby="usuarios-rol-etiqueta"
+        [value]="filtros().rol"
+        (selectionChange)="elegirRol($event.value)"
+      >
+        <mat-option value="">Todos</mat-option>
+        @for (rol of roles(); track rol.id) {
+          <mat-option [value]="rol.id">{{ rol.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</ng-template>
+
+<ng-template #filtroEstado>
+  <div class="lista-usuarios__campo-filtro">
+    <label class="etiqueta" id="usuarios-estado-etiqueta" for="usuarios-estado">Estado</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-select
+        id="usuarios-estado"
+        aria-labelledby="usuarios-estado-etiqueta"
+        [value]="filtros().estado"
+        (selectionChange)="elegirEstado($event.value)"
+      >
+        @for (opcion of opcionesEstado; track opcion.valor) {
+          <mat-option [value]="opcion.valor">{{ opcion.texto }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</ng-template>

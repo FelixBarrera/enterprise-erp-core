@@ -1,0 +1,33 @@
+# Dependencias y compilados
+node_modules/
+dist/
+coverage/
+.angular/
+*.tsbuildinfo
+
+# Cliente de Prisma generado
+apps/base-backend/src/generated/
+
+# Secretos
+.env*
+!.env.example
+*.p12
+*.pem
+
+# Sistema y editores
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Kit de arranque (solo local, no se sube)
+docs/kit-arranque-*.md
+
+# Despliegue: lo de cada servidor (contraseñas de clientes, sitios, certificados) no se sube
+despliegue/clientes/*
+!despliegue/clientes/ejemplo/
+despliegue/sitios/
+despliegue/certificados/
+despliegue/acme/
+despliegue/respaldos/
+despliegue/copia-externa/

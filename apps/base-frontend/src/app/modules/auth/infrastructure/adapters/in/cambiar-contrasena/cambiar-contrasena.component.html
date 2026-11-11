@@ -1,0 +1,238 @@
+@if (temporal) {
+  <!-- Con la contraseña temporal no hay menú: solo la marca y «Salir». -->
+  <header class="cabecera-sola">
+    <app-marca />
+    <button
+      matButton="outlined"
+      type="button"
+      class="cabecera-sola__salir"
+      [disabled]="saliendo()"
+      [disabledInteractive]="true"
+      (click)="salir()"
+    >
+      <app-icono nombre="salir" [tamano]="16" />
+      {{ saliendo() ? 'Saliendo…' : 'Salir' }}
+    </button>
+  </header>
+  <main class="cambio cambio--temporal">
+    <ng-container [ngTemplateOutlet]="contenido" />
+  </main>
+} @else {
+  <div class="cambio">
+    <header class="encabezado-pagina">
+      <div>
+        <h1 class="titulo-pagina">Cambiar contraseña</h1>
+        <p class="subtitulo-pagina">Escriba la actual y elija una nueva.</p>
+      </div>
+    </header>
+    <ng-container [ngTemplateOutlet]="contenido" />
+  </div>
+}
+
+<ng-template #contenido>
+  <div class="cambio__columnas">
+    <section class="cambio__tarjeta" aria-labelledby="cambio-titulo">
+      @if (temporal) {
+        <span class="cambio__sello" aria-hidden="true">
+          <app-icono nombre="llave" [tamano]="24" />
+        </span>
+        <h1 id="cambio-titulo" class="cambio__titulo">Elija su contraseña</h1>
+        <p class="cambio__explicacion">
+          {{ saludo() }} administrador le dio una contraseña temporal. Antes de continuar, cámbiela
+          por una que solo usted conozca.
+        </p>
+      } @else {
+        <h2 id="cambio-titulo" class="cambio__subtitulo">Su contraseña</h2>
+      }
+
+      <form
+        class="cambio__formulario"
+        [formGroup]="formulario"
+        (ngSubmit)="guardar()"
+        novalidate
+        [attr.aria-busy]="enviando()"
+      >
+        <div class="campo">
+          <label class="etiqueta" for="cambio-actual">
+            {{ temporal ? 'Contraseña temporal' : 'Contraseña actual' }}
+          </label>
+          <mat-form-field>
+            <input
+              #campoActual
+              matInput
+              id="cambio-actual"
+              type="password"
+              formControlName="actual"
+              autocomplete="current-password"
+              [attr.aria-describedby]="
+                formulario.controls.actual.touched && formulario.controls.actual.invalid
+                  ? 'cambio-actual-error'
+                  : null
+              "
+            />
+            @if (formulario.controls.actual.hasError('obligatorio')) {
+              <mat-error id="cambio-actual-error">
+                {{ temporal ? 'Escriba la contraseña temporal' : 'Escriba su contraseña actual' }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="campo">
+          <label class="etiqueta" for="cambio-nueva">Contraseña nueva</label>
+          <mat-form-field subscriptSizing="dynamic">
+            <input
+              #campoNueva
+              matInput
+              id="cambio-nueva"
+              formControlName="nueva"
+              autocomplete="new-password"
+              [type]="verContrasenas() ? 'text' : 'password'"
+              [attr.aria-describedby]="
+                formulario.controls.nueva.touched && formulario.controls.nueva.invalid
+                  ? 'cambio-nueva-error cambio-fuerza cambio-reglas'
+                  : 'cambio-fuerza cambio-reglas'
+              "
+            />
+            <button
+              matIconButton
+              matSuffix
+              type="button"
+              [attr.aria-label]="
+                verContrasenas()
+                  ? 'Ocultar las contraseñas nuevas'
+                  : 'Mostrar las contraseñas nuevas'
+              "
+              [attr.aria-pressed]="verContrasenas()"
+              (click)="alternarVerContrasenas()"
+            >
+              <app-icono [nombre]="verContrasenas() ? 'ocultar' : 'ver'" [tamano]="18" />
+            </button>
+            @if (formulario.controls.nueva.hasError('obligatorio')) {
+              <mat-error id="cambio-nueva-error">Escriba la contraseña nueva</mat-error>
+            } @else if (formulario.controls.nueva.hasError('largo')) {
+              <mat-error id="cambio-nueva-error">Debe tener entre 8 y 128 caracteres</mat-error>
+            }
+          </mat-form-field>
+          <div class="fuerza" [attr.data-nivel]="fuerza().nivel" aria-hidden="true">
+            @for (raya of rayas; track raya) {
+              <span
+                class="fuerza__raya"
+                [class.fuerza__raya--llena]="fuerza().nivel >= raya"
+              ></span>
+            }
+          </div>
+          <p id="cambio-fuerza" class="fuerza__texto">{{ fuerza().texto }}</p>
+        </div>
+
+        <div class="campo">
+          <label class="etiqueta" for="cambio-repetir">Repita la contraseña nueva</label>
+          <mat-form-field>
+            <input
+              #campoRepetir
+              matInput
+              id="cambio-repetir"
+              formControlName="repetir"
+              autocomplete="new-password"
+              [type]="verContrasenas() ? 'text' : 'password'"
+              [attr.aria-describedby]="
+                formulario.controls.repetir.touched && formulario.controls.repetir.invalid
+                  ? 'cambio-repetir-error'
+                  : null
+              "
+            />
+            @if (formulario.controls.repetir.hasError('obligatorio')) {
+              <mat-error id="cambio-repetir-error">Repita la contraseña nueva</mat-error>
+            } @else if (formulario.controls.repetir.hasError('noCoincide')) {
+              <mat-error id="cambio-repetir-error">Las dos contraseñas no coinciden</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div role="alert">
+          @if (error(); as mensaje) {
+            <p class="mensaje-error">
+              <app-icono nombre="alerta" [tamano]="18" />
+              <span>{{ mensaje }}</span>
+            </p>
+          }
+        </div>
+
+        <div class="cambio__botones">
+          <button
+            matButton="filled"
+            type="submit"
+            class="cambio__guardar"
+            [disabled]="enviando()"
+            [disabledInteractive]="true"
+          >
+            @if (enviando()) {
+              Guardando…
+            } @else {
+              {{ temporal ? 'Guardar y continuar' : 'Guardar contraseña' }}
+            }
+          </button>
+          @if (!temporal) {
+            <a matButton="outlined" class="cambio__cancelar" [routerLink]="destinoCancelar"
+              >Cancelar</a
+            >
+          }
+        </div>
+      </form>
+    </section>
+
+    <aside id="cambio-reglas" class="cambio__ayuda" aria-label="Cómo debe ser la contraseña nueva">
+      <div class="reglas">
+        <h2 class="reglas__titulo">Su contraseña nueva</h2>
+        <ul class="reglas__lista">
+          <li class="regla" [class.regla--cumplida]="largoValido()">
+            <span class="regla__marca" aria-hidden="true"
+              ><app-icono nombre="listo" [tamano]="12"
+            /></span>
+            <span>
+              Tiene entre 8 y 128 caracteres
+              <span class="oculto-visual">{{ largoValido() ? '(cumplido)' : '(pendiente)' }}</span>
+            </span>
+          </li>
+          <li class="regla" [class.regla--cumplida]="coinciden()">
+            <span class="regla__marca" aria-hidden="true"
+              ><app-icono nombre="listo" [tamano]="12"
+            /></span>
+            <span>
+              Las dos veces es igual
+              <span class="oculto-visual">{{ coinciden() ? '(cumplido)' : '(pendiente)' }}</span>
+            </span>
+          </li>
+          <li class="regla regla--informativa">
+            <span class="regla__marca" aria-hidden="true"
+              ><app-icono nombre="informacion" [tamano]="14"
+            /></span>
+            <span
+              >No es una contraseña común ni fácil de adivinar (como «12345678» o «aaaaaaaa»)</span
+            >
+          </li>
+          <li class="regla regla--informativa">
+            <span class="regla__marca" aria-hidden="true"
+              ><app-icono nombre="informacion" [tamano]="14"
+            /></span>
+            <span>
+              No contiene su usuario ni el nombre de la empresa, y es distinta de la
+              {{ temporal ? 'temporal' : 'actual' }}
+            </span>
+          </li>
+        </ul>
+        <p class="reglas__nota">
+          Las dos últimas se revisan al guardar. Una frase de varias palabras es fácil de recordar y
+          difícil de adivinar.
+        </p>
+      </div>
+
+      <p class="cambio__sesiones">
+        <app-icono nombre="escudo" [tamano]="18" />
+        <span
+          >Al guardarla se cierran sus sesiones abiertas en otros equipos. Esta sigue abierta.</span
+        >
+      </p>
+    </aside>
+  </div>
+</ng-template>

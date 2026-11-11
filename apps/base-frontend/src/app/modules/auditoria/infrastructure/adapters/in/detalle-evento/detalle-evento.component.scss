@@ -1,0 +1,216 @@
+:host {
+  display: block;
+}
+
+.detalle-evento__falla {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 720px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.detalle-evento__simbolo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-primario-suave);
+  color: var(--color-primario);
+}
+
+// «Qué cambió» ancho y «Datos del evento» al lado; debajo, si no entran.
+.detalle-evento__columnas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.detalle-evento__cambios {
+  flex: 2 1 520px;
+  min-width: 0;
+}
+
+.detalle-evento__datos {
+  flex: 1 1 300px;
+  min-width: 0;
+
+  .tarjeta__titulo {
+    margin-bottom: 14px;
+  }
+}
+
+.detalle-evento__cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+// Con la tabla, la tarjeta no tiene relleno (`tarjeta--tabla`): lo pone cada parte.
+.tarjeta--tabla {
+  .detalle-evento__cabecera {
+    margin: 0;
+    padding: 16px 20px 12px;
+  }
+
+  .detalle-evento__leyenda {
+    padding: 0 20px 14px;
+  }
+}
+
+.detalle-evento__ayuda {
+  margin: 0;
+  color: var(--color-texto-secundario);
+}
+
+.detalle-evento__tabla {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--color-borde-suave);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    border-top: 1px solid var(--color-borde);
+    border-bottom-color: var(--color-borde);
+    background: var(--color-encabezado-tabla);
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  tbody th {
+    font-weight: 600;
+  }
+}
+
+.detalle-evento__dato {
+  width: 180px;
+}
+
+.detalle-evento__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  color: var(--color-texto-secundario);
+}
+
+.detalle-evento__muestra {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+
+  &--agrega {
+    background: var(--estado-exito);
+  }
+
+  &--quita {
+    margin-left: 12px;
+    background: var(--estado-peligro);
+  }
+}
+
+.detalle-evento__lista-datos {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 16px;
+  margin: 0;
+
+  // Cada par en su fila de la grilla.
+  > div {
+    display: contents;
+  }
+
+  dt {
+    color: var(--color-texto-secundario);
+  }
+
+  dd {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+  }
+}
+
+.detalle-evento__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.detalle-evento__tenue {
+  color: var(--color-texto-secundario);
+}
+
+.detalle-evento__largo {
+  overflow-wrap: anywhere;
+}
+
+.detalle-evento__codigo {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+
+// ── Celular: el antes y el después, uno debajo del otro ─────────────────────────────────────────
+.detalle-evento__filas-celular {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+}
+
+.detalle-evento__fila-celular {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  & + & {
+    padding-top: 16px;
+    border-top: 1px solid var(--color-borde-suave);
+  }
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+  }
+}
+
+.detalle-evento__lado {
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+}
+
+@media (max-width: 599.98px) {
+  .detalle-evento__lista-datos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+
+    dd {
+      margin-bottom: 8px;
+    }
+  }
+}

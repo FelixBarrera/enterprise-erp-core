@@ -1,0 +1,157 @@
+// Módulo auth: usuarios y roles (docs/modulos/auth-usuarios.md, sección 3).
+// Esquema seguridad. Sesiones desde el 6.5a; permisos y roles_permisos desde el 6.6a.
+// Escrito a mano en la migración crear_usuarios_roles: los CHECK, los únicos parciales de
+// roles (nombre entre los activos, un administrador por empresa) y el de nombre no vacío.
+
+// Maestro, sin empresa_id: una persona puede trabajar en varias empresas (AUTH-D2).
+// nombre_usuario único para siempre, aunque se desactive (AUTH-D3).
+model Usuario {
+  id                    String    @id @default(uuid(7)) @db.Uuid
+  nombreUsuario         String    @unique(map: "usuarios_nombre_usuario_key") @map("nombre_usuario") @db.VarChar(50)
+  nombreCompleto        String    @map("nombre_completo") @db.VarChar(150)
+  /// Argon2id en formato PHC. Nunca sale de la API ni va a la bitácora.
+  hashContrasena        String    @map("hash_contrasena") @db.VarChar(255)
+  debeCambiarContrasena Boolean   @default(true) @map("debe_cambiar_contrasena")
+  intentosFallidos      Int       @default(0) @map("intentos_fallidos") @db.SmallInt
+  bloqueadoHasta        DateTime? @map("bloqueado_hasta") @db.Timestamptz(6)
+  ultimaEmpresaId       String?   @map("ultima_empresa_id") @db.Uuid
+  ultimoIngresoEn       DateTime? @map("ultimo_ingreso_en") @db.Timestamptz(6)
+  activo                Boolean   @default(true)
+  creadoEn              DateTime  @default(now()) @map("creado_en") @db.Timestamptz(6)
+  creadoPor             String?   @map("creado_por") @db.Uuid
+  actualizadoEn         DateTime  @updatedAt @map("actualizado_en") @db.Timestamptz(6)
+  actualizadoPor        String?   @map("actualizado_por") @db.Uuid
+
+  ultimaEmpresa Empresa?     @relation(fields: [ultimaEmpresaId], references: [id], onDelete: Restrict)
+  roles         UsuarioRol[]
+  sesiones      Sesion[]
+
+  @@index([ultimaEmpresaId])
+  @@map("usuarios")
+  @@schema("seguridad")
+}
+
+// Maestro por empresa. Un solo administrador por empresa, que no se desactiva (AUTH-D10).
+model Rol {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  empresaId       String   @map("empresa_id") @db.Uuid
+  nombre          String   @db.VarChar(80)
+  descripcion     String?  @db.VarChar(250)
+  esAdministrador Boolean  @default(false) @map("es_administrador")
+  activo          Boolean  @default(true)
+  creadoEn        DateTime @default(now()) @map("creado_en") @db.Timestamptz(6)
+  creadoPor       String?  @map("creado_por") @db.Uuid
+  actualizadoEn   DateTime @updatedAt @map("actualizado_en") @db.Timestamptz(6)
+  actualizadoPor  String?  @map("actualizado_por") @db.Uuid
+
+  empresa  Empresa      @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+  usuarios UsuarioRol[]
+  permisos RolPermiso[]
+
+  // Para la FK compuesta de usuarios_roles; empieza por empresa_id, así sirve también de
+  // índice de la FK a empresas.
+  @@unique([empresaId, id], map: "roles_empresa_id_id_key")
+  @@map("roles")
+  @@schema("seguridad")
+}
+
+// Unión: tener un rol en una empresa = tener acceso a ella (AUTH-D2).
+// empresa_id es copia de la del rol; la FK compuesta impide que no coincida.
+model UsuarioRol {
+  usuarioId String   @map("usuario_id") @db.Uuid
+  empresaId String   @map("empresa_id") @db.Uuid
+  rolId     String   @map("rol_id") @db.Uuid
+  creadoEn  DateTime @default(now()) @map("creado_en") @db.Timestamptz(6)
+  creadoPor String?  @map("creado_por") @db.Uuid
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+  rol     Rol     @relation(fields: [empresaId, rolId], references: [empresaId, id], onDelete: Restrict)
+
+  @@id([usuarioId, rolId])
+  @@index([empresaId, usuarioId])
+  @@index([rolId])
+  @@map("usuarios_roles")
+  @@schema("seguridad")
+}
+
+// Por qué se cerró una sesión (docs/modulos/auth-usuarios.md, sección 3).
+enum MotivoCierreSesion {
+  SALIDA
+  CAMBIO_CONTRASENA
+  REUSO
+  ADMINISTRADOR
+  USUARIO_DESACTIVADO
+  EMPRESA_DESACTIVADA
+  ACCESO_QUITADO
+
+  @@map("motivo_cierre_sesion")
+  @@schema("seguridad")
+}
+
+// Técnica: una por cada ingreso (AUTH-D5, AUTH-D6). Sin creado/actualizado_por (excepción
+// de las tablas de sesión, docs/modelo-datos.md). El id es el sid del access token y la
+// primera parte del refresh token; del secreto solo se guarda su SHA-256.
+// Escrito a mano en la migración crear_sesiones: los dos índices parciales de las abiertas y
+// los CHECK (cerrada con motivo, vencimiento después del inicio, hashes de 64 caracteres).
+model Sesion {
+  id                  String              @id @default(uuid(7)) @db.Uuid
+  usuarioId           String              @map("usuario_id") @db.Uuid
+  /// La empresa activa (AUTH-D5): cambiarla no pide otro token.
+  empresaId           String              @map("empresa_id") @db.Uuid
+  /// SHA-256 (hex) del secreto vigente.
+  hashRefresh         String              @map("hash_refresh") @db.Char(64)
+  /// SHA-256 del anterior: vale 60 s después de rotar (AUTH-D7).
+  hashRefreshAnterior String?             @map("hash_refresh_anterior") @db.Char(64)
+  rotadoEn            DateTime?           @map("rotado_en") @db.Timestamptz(6)
+  iniciadaEn          DateTime            @map("iniciada_en") @db.Timestamptz(6)
+  venceEn             DateTime            @map("vence_en") @db.Timestamptz(6)
+  ultimoUsoEn         DateTime            @map("ultimo_uso_en") @db.Timestamptz(6)
+  cerradaEn           DateTime?           @map("cerrada_en") @db.Timestamptz(6)
+  motivoCierre        MotivoCierreSesion? @map("motivo_cierre")
+  ip                  String?             @db.VarChar(45)
+  navegador           String?             @db.VarChar(300)
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+  empresa Empresa @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+
+  @@map("sesiones")
+  @@schema("seguridad")
+}
+
+// Catálogo técnico: lo escribe el arranque desde los <modulo>.permisos.ts (6.6a). Sin empresa_id
+// (el catálogo es del código) y sin *_por (no lo escribe una persona): excepciones anotadas en
+// docs/modelo-datos.md. Nunca se borra: el que el código ya no declara queda obsoleto.
+// Escrito a mano en la migración crear_permisos: el formato del código y la descripción no vacía.
+model Permiso {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  /// modulo.recurso.accion
+  codigo        String   @unique(map: "permisos_codigo_key") @db.VarChar(100)
+  /// Lo que ve quien arma un rol ("Ver usuarios").
+  descripcion   String   @db.VarChar(150)
+  /// Ya no lo declara el código: no cuenta para nadie ni sale en pantalla.
+  obsoleto      Boolean  @default(false)
+  creadoEn      DateTime @default(now()) @map("creado_en") @db.Timestamptz(6)
+  actualizadoEn DateTime @updatedAt @map("actualizado_en") @db.Timestamptz(6)
+
+  roles RolPermiso[]
+
+  @@map("permisos")
+  @@schema("seguridad")
+}
+
+// Unión: los permisos de cada rol. El Administrador no lleva filas: tiene todos por su marca
+// (AUTH-D10); lo cuida un trigger escrito a mano en la migración crear_permisos.
+model RolPermiso {
+  rolId     String   @map("rol_id") @db.Uuid
+  permisoId String   @map("permiso_id") @db.Uuid
+  creadoEn  DateTime @default(now()) @map("creado_en") @db.Timestamptz(6)
+  creadoPor String?  @map("creado_por") @db.Uuid
+
+  rol     Rol     @relation(fields: [rolId], references: [id], onDelete: Restrict)
+  permiso Permiso @relation(fields: [permisoId], references: [id], onDelete: Restrict)
+
+  @@id([rolId, permisoId])
+  @@index([permisoId])
+  @@map("roles_permisos")
+  @@schema("seguridad")
+}

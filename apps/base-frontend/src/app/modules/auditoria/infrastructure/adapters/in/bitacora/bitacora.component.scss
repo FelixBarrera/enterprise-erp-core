@@ -1,0 +1,157 @@
+.bitacora__titulo-filtros {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bitacora__campos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.bitacora__campo-fecha {
+  flex: 1 1 150px;
+}
+
+.bitacora__campo-usuario {
+  flex: 1 1 190px;
+}
+
+.bitacora__campo-accion {
+  flex: 2 1 260px;
+}
+
+.bitacora__ayuda {
+  flex: 1 0 100%;
+  margin: 0;
+  color: var(--color-texto-secundario);
+}
+
+.bitacora__fecha {
+  width: 170px;
+  white-space: nowrap;
+}
+
+.bitacora__quien {
+  width: 180px;
+}
+
+.bitacora__sobre {
+  width: 220px;
+  color: var(--color-texto-secundario);
+}
+
+.bitacora__sistema {
+  color: var(--color-texto-secundario);
+}
+
+.bitacora__accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.bitacora__texto-accion {
+  color: var(--color-texto);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.bitacora__fila {
+  cursor: pointer;
+}
+
+.bitacora__abrir {
+  width: 40px;
+  color: var(--color-texto-tenue);
+}
+
+// «Ver historia»: de quién es la historia, volver a su ficha o ver toda la bitácora.
+.bitacora__historia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-primario-suave);
+  color: var(--color-primario-oscuro);
+}
+
+.bitacora__historia-texto {
+  flex: 1 1 240px;
+  margin: 0;
+  line-height: 1.45;
+}
+
+// ── Celular ─────────────────────────────────────────────────────────────────────────────────────
+.bitacora__barra-celular {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bitacora__rango {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+
+  app-icono {
+    color: var(--color-texto-secundario);
+  }
+}
+
+.bitacora__boton-filtros {
+  flex: none;
+  height: 44px;
+}
+
+.bitacora__burbuja {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--color-primario);
+  color: var(--color-superficie);
+  font-size: 12px;
+}
+
+.bitacora__filtros-celular {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  // En columna, el ancho que los campos tienen en la PC (`flex: 1 1 150px`) sería su alto.
+  > * {
+    flex: none;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+}

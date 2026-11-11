@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <!-- Original PROVISIONAL del ícono "maskable" de la PWA y del ícono del iPhone (por confirmar con el negocio).
+       Fondo a sangre (el teléfono recorta la forma) y las barras dentro de la zona segura (círculo del 80 %).
+       Los PNG de public/iconos-app/ salen de aquí y de public/marca/simbolo.svg: ver docs/marca/README.md. -->
+  <rect width="40" height="40" fill="#0a1a33"/>
+  <g transform="translate(20 20) scale(0.75) translate(-20 -20)">
+    <rect x="10" y="22" width="5" height="9" rx="1.5" fill="#fff"/>
+    <rect x="17.5" y="16" width="5" height="15" rx="1.5" fill="#fff"/>
+    <rect x="25" y="9" width="5" height="22" rx="1.5" fill="#c9a646"/>
+  </g>
+</svg>

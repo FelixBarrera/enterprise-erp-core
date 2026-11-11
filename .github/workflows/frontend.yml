@@ -1,0 +1,62 @@
+# CI del frontend: corre solo si cambian archivos del frontend o de la raíz.
+# Acciones fijadas por SHA (el comentario dice la versión). Las actualiza Dependabot.
+name: Frontend
+
+on:
+  pull_request:
+    paths:
+      - 'apps/base-frontend/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.nvmrc'
+      - '.github/workflows/frontend.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/base-frontend/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.nvmrc'
+      - '.github/workflows/frontend.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Lint, tipos, pruebas y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # El postinstall del backend genera el cliente de Prisma y necesita una URL (no se conecta).
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+      - name: Lint
+        run: pnpm --filter base-frontend lint
+
+      - name: Revisión de tipos de las pruebas
+        run: pnpm --filter base-frontend exec tsc --noEmit -p tsconfig.spec.json
+
+      # Con cobertura: falla si baja de los umbrales (vitest.config.mts).
+      - name: Pruebas unitarias con cobertura
+        run: pnpm --filter base-frontend test:cov
+
+      - name: Compilación
+        run: pnpm --filter base-frontend build

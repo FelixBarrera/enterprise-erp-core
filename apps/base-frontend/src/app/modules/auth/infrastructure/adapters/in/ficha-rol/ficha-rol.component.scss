@@ -1,0 +1,149 @@
+:host {
+  display: block;
+}
+
+// El rol: un escudo en un cuadro (dorado el Administrador, como en la lista).
+.ficha-rol__simbolo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-primario-suave);
+  color: var(--color-primario);
+
+  &--administrador {
+    background: var(--color-acento-suave);
+    color: var(--color-acento-texto);
+  }
+}
+
+.ficha-rol__nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 720px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: var(--radio);
+  background: var(--color-primario-suave);
+  color: var(--color-primario-oscuro);
+  line-height: 1.45;
+
+  app-icono {
+    flex: none;
+    margin-top: 1px;
+  }
+
+  &--aviso {
+    background: var(--estado-aviso-fondo);
+    color: var(--estado-aviso);
+  }
+}
+
+.ficha-rol__datos {
+  max-width: 720px;
+
+  .tarjeta__titulo {
+    margin-bottom: 14px;
+  }
+}
+
+.ficha-rol__pestanas {
+  margin-bottom: 16px;
+}
+
+// «8 de 12» al lado de «Permisos».
+.ficha-rol__contador-pestana {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--estado-neutro-fondo);
+  color: var(--estado-neutro);
+  font-size: 13px;
+}
+
+.ficha-rol__solo-lectura {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+
+  dd {
+    margin: 0 0 12px;
+    overflow-wrap: anywhere;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// La barra de cambios: queda a la vista abajo mientras se baja por la ficha.
+.ficha-rol__cambios {
+  position: sticky;
+  bottom: 16px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-flotante);
+}
+
+.ficha-rol__error {
+  flex: 1 0 100%;
+
+  &:empty {
+    display: none;
+  }
+
+  .mensaje-error {
+    margin: 0;
+  }
+}
+
+.ficha-rol__texto-cambios {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  color: var(--estado-aviso);
+  font-weight: 600;
+}
+
+.ficha-rol__falla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  p {
+    margin: 0;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .ficha-rol__cambios {
+    bottom: 0;
+    margin-right: -16px;
+    margin-left: -16px;
+    border-radius: 0;
+
+    button {
+      flex: 1 1 auto;
+      min-height: 48px;
+    }
+  }
+
+  .ficha-rol__texto-cambios {
+    flex-basis: 100%;
+  }
+}

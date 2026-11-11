@@ -1,0 +1,21 @@
+<h2 class="confirmacion__titulo" [id]="datos.idTitulo">{{ datos.titulo }}</h2>
+<p class="confirmacion__mensaje" [id]="datos.idMensaje">{{ datos.mensaje }}</p>
+<div class="confirmacion__acciones">
+  <button
+    type="button"
+    class="boton boton--secundario"
+    [id]="datos.idCancelar"
+    (click)="responder(false)"
+  >
+    Cancelar
+  </button>
+  <button
+    type="button"
+    class="boton"
+    [class.boton--peligro]="datos.peligro"
+    [class.boton--primario]="!datos.peligro"
+    (click)="responder(true)"
+  >
+    {{ datos.textoConfirmar }}
+  </button>
+</div>

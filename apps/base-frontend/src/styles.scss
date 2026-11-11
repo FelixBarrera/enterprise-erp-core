@@ -1,0 +1,837 @@
+// Estilos globales: tema 2026 (Material con aspecto compacto) y marca.
+// docs/arquitectura-frontend.md, secciones 8.5 y 8.6. Contraste AA comprobado para cada par.
+@use '@angular/material' as mat;
+
+// ── Fuente ──────────────────────────────────────────────────────────────────────────────────────
+// Inter (licencia OFL, paquete @fontsource-variable/inter): viene dentro del proyecto, así funciona
+// sin conexión. Solo las letras latinas (español y nombres con otros acentos); un solo archivo
+// variable para todos los gruesos. El navegador baja el segundo solo si aparece una de sus letras.
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+// ── Marca y colores ─────────────────────────────────────────────────────────────────────────────
+// Marca PROVISIONAL (por confirmar con el negocio; maqueta aprobada el 2026-11-06): para cambiarla,
+// los --color-primario*, --color-menu*, --color-acento* y los lugares que lista la sección 8.6.
+:root {
+  --color-primario: #1f4fbf; // botones y enlaces; con texto blanco: 7,2:1
+  --color-primario-oscuro: #173c93; // al pasar el mouse (con texto blanco: 9,6:1)
+  --color-primario-suave: #e8eefb; // fondos marcados e iniciales (texto primario encima: 6,1:1)
+  --color-acento: #c9a646; // dorado: SOLO como detalle sobre el azul oscuro (7,5:1)
+  --color-acento-texto: #8a6a1f; // dorado sobre fondo claro (5:1 sobre blanco)
+  --color-acento-suave: #f7efd9; // fondo del símbolo del rol Administrador (con --color-acento-texto: 4,4:1, decorativo)
+  --color-acento-texto-fuerte: #7a5c14; // texto dorado sobre --color-acento-suave: 5,4:1 (el rol Administrador en una lista)
+
+  // Marca y menú lateral: azul muy oscuro.
+  --color-menu: #0a1a33; // texto blanco: 17,4:1
+  --color-menu-texto: #fff;
+  --color-menu-opcion: #d5ddea; // opciones no elegidas: 12,6:1
+  --color-menu-titulo: #8fa0ba; // títulos de sección: 6,6:1
+  --color-menu-hover: #15253d; // texto blanco: 15,4:1
+  --color-menu-activo: #22314a; // texto blanco: 12,9:1; ícono dorado: 5,6:1
+  --color-menu-borde: rgb(255 255 255 / 10%);
+
+  --color-texto: #0f172a; // 17,9:1 sobre blanco
+  --color-texto-secundario: #526075; // 6,4:1 sobre blanco; 5,9:1 sobre el fondo
+  --color-texto-tenue: #6b7789; // solo para datos que acompañan: 4,6:1 sobre blanco
+  --color-superficie: #fff; // tarjetas
+  --color-fondo: #f5f7fa; // detrás de las tarjetas
+  --color-encabezado-tabla: #f8fafc;
+  --color-fila-hover: #f3f6fa;
+  --color-borde: #e3e8ef; // líneas que separan (tablas, tarjetas): decorativas
+  --color-borde-suave: #eef1f5; // separadores dentro de una tarjeta o un menú
+  --color-borde-campo: #8792a4; // borde de campos: 3,2:1, el mínimo para identificar un control
+  --anillo-foco: 0 0 0 4px rgb(31 79 191 / 18%);
+
+  // Estados (chips suaves): texto en el color fuerte sobre su fondo suave (todos AA).
+  --estado-exito: #126b3e; // 5,8:1 sobre su fondo
+  --estado-exito-fondo: #e6f4ec;
+  --estado-neutro: #4b5565; // 6,7:1
+  --estado-neutro-fondo: #eef1f5;
+  --estado-aviso: #8a5100; // 5,9:1
+  --estado-aviso-fondo: #fff3dc;
+  --estado-peligro: #b42318; // 5,8:1 sobre su fondo; 6,6:1 sobre blanco
+  --estado-peligro-fondo: #fdecea;
+
+  // Medidas.
+  --radio: 10px; // campos, botones, opciones del menú
+  --radio-tarjeta: 12px;
+  --radio-grande: 16px; // tarjetas sueltas (login, cambiar la contraseña)
+  --sombra-tarjeta: 0 1px 3px rgb(15 23 42 / 5%);
+  --sombra-flotante: 0 12px 32px rgb(15 23 42 / 14%), 0 2px 6px rgb(15 23 42 / 6%); // menús
+  --sombra-boton: 0 1px 2px rgb(15 23 42 / 12%);
+
+  --fuente-base:
+    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+// ── Tema de Material ────────────────────────────────────────────────────────────────────────────
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        theme-type: light,
+      ),
+      typography: (
+        plain-family: var(--fuente-base),
+        brand-family: var(--fuente-base),
+      ),
+      density: 0,
+    )
+  );
+
+  // El color de la marca manda sobre la paleta de Material.
+  @include mat.theme-overrides(
+    (
+      primary: var(--color-primario),
+      on-primary: #fff,
+      surface: var(--color-superficie),
+      on-surface: var(--color-texto),
+      on-surface-variant: var(--color-texto-secundario),
+      outline: var(--color-borde-campo),
+      outline-variant: var(--color-borde),
+      error: var(--estado-peligro),
+    )
+  );
+
+  // Campos de 40 px, esquinas de 10 px, texto de 14 px.
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      container-text-size: 14px,
+      outlined-container-shape: 10px,
+      outlined-outline-color: var(--color-borde-campo),
+      outlined-hover-outline-color: var(--color-texto-secundario),
+      outlined-focus-outline-color: var(--color-primario),
+      outlined-focus-outline-width: 1px,
+      subscript-text-size: 14px,
+    )
+  );
+
+  // Listas desplegables con el mismo texto que los demás campos.
+  @include mat.select-overrides(
+    (
+      trigger-text-size: 14px,
+    )
+  );
+
+  // Botones de 40 px, esquinas de 10 px, sin mayúsculas, en semi-negrita.
+  @include mat.button-overrides(
+    (
+      filled-container-shape: 10px,
+      filled-container-height: 40px,
+      outlined-container-shape: 10px,
+      outlined-container-height: 40px,
+      outlined-outline-color: var(--color-borde-campo),
+      text-container-shape: 10px,
+      text-container-height: 40px,
+      protected-container-shape: 10px,
+      protected-container-height: 40px,
+      tonal-container-shape: 10px,
+      tonal-container-height: 40px,
+      filled-label-text-weight: 600,
+      outlined-label-text-weight: 600,
+      text-label-text-weight: 600,
+      protected-label-text-weight: 600,
+      tonal-label-text-weight: 600,
+    )
+  );
+
+  // Tablas: encabezado claro (texto secundario en semi-negrita), sin rayas, líneas finas.
+  @include mat.table-overrides(
+    (
+      background-color: var(--color-superficie),
+      header-headline-color: var(--color-texto-secundario),
+      header-headline-weight: 600,
+      header-headline-size: 14px,
+      header-container-height: 44px,
+      row-item-container-height: 48px,
+      row-item-label-text-size: 14px,
+      row-item-outline-color: var(--color-borde),
+    )
+  );
+
+  // Pestañas de una ficha: 44 px, semi-negrita, la elegida en azul con una raya de 3 px debajo.
+  @include mat.tabs-overrides(
+    (
+      container-height: 44px,
+      label-text-size: 14px,
+      label-text-weight: 600,
+      active-indicator-color: var(--color-primario),
+      active-focus-indicator-color: var(--color-primario),
+      active-hover-indicator-color: var(--color-primario),
+      active-indicator-height: 3px,
+      active-label-text-color: var(--color-primario),
+      active-focus-label-text-color: var(--color-primario),
+      active-hover-label-text-color: var(--color-primario-oscuro),
+      inactive-label-text-color: var(--color-texto-secundario),
+      inactive-focus-label-text-color: var(--color-texto),
+      inactive-hover-label-text-color: var(--color-texto),
+      divider-color: var(--color-borde),
+    )
+  );
+
+  // Celular: texto de los campos a 16 px (con menos, el iPhone agranda la página) y botones
+  // táctiles de 44 px.
+  @media (max-width: 599.98px) {
+    @include mat.form-field-overrides(
+      (
+        container-height: 44px,
+        container-text-size: 16px,
+      )
+    );
+    @include mat.select-overrides(
+      (
+        trigger-text-size: 16px,
+      )
+    );
+    @include mat.button-overrides(
+      (
+        filled-container-height: 44px,
+        outlined-container-height: 44px,
+        text-container-height: 44px,
+        protected-container-height: 44px,
+        tonal-container-height: 44px,
+      )
+    );
+  }
+}
+
+// ── Base ────────────────────────────────────────────────────────────────────────────────────────
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-base);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+// Foco visible en todo lo que se puede usar con el teclado (WCAG AA).
+:focus-visible {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 2px;
+}
+
+// ── Piezas comunes de las pantallas ─────────────────────────────────────────────────────────────
+// Encabezado de la pantalla: título, una línea que explica la pantalla y, a la derecha, la acción
+// principal. `<header class="encabezado-pagina"><div><h1 class="titulo-pagina">…</h1>
+// <p class="subtitulo-pagina">…</p></div><button …>…</button></header>`
+.encabezado-pagina {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+
+  .titulo-pagina {
+    margin: 0;
+  }
+}
+
+// Títulos: Inter en negrita y un poco más juntos (el aire de un título de diseño, sin otra fuente).
+.titulo-pagina {
+  margin: 0 0 16px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+
+  @media (max-width: 599.98px) {
+    font-size: 22px;
+  }
+}
+
+.subtitulo-pagina {
+  margin: 6px 0 0;
+  color: var(--color-texto-secundario);
+  font-size: 15px;
+}
+
+// Tarjeta blanca sobre el fondo gris. Con una tabla dentro, `tarjeta tarjeta--tabla` (sin relleno).
+.tarjeta {
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-tarjeta);
+
+  // Antes que --tabla, para que esta no pierda su relleno en cero.
+  @media (max-width: 599.98px) {
+    padding: 16px;
+  }
+
+  &--tabla {
+    overflow-x: auto;
+    padding: 0;
+  }
+}
+
+// Título de una tarjeta o de un bloque de la ficha, con lo suyo a la derecha (contador, enlace).
+.tarjeta__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.tarjeta__titulo {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+// Filtros de una lista: campos alineados a la base, de 200 px o más cada uno.
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px 16px;
+  align-items: end;
+}
+
+// Número pequeño en una burbuja: «2 filtros», «5 de 12».
+.contador {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--color-primario-suave);
+  color: var(--color-primario);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Pestañas de una ficha (`mat-tab-group`): el contenido, separado de la raya; sin recortar los
+// anillos de foco ni la sombra de las tarjetas.
+.mat-mdc-tab-body-content {
+  padding-top: 16px;
+  overflow: visible;
+}
+
+// En el celular, las pestañas estiradas con menos relleno: tres con su cifra («Roles 3») caben en
+// 390 px sin las flechas de desplazamiento.
+@media (max-width: 599.98px) {
+  .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs .mdc-tab {
+    min-width: 0;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+// Etiqueta arriba del campo (sin mat-label flotante): docs/arquitectura-frontend.md, sección 3.
+// Campo no obligatorio: `<label class="etiqueta" for="x">Teléfono <span class="opcional">(opcional)</span></label>`.
+.etiqueta {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-texto);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.opcional {
+  color: var(--color-texto-secundario);
+  font-weight: 400;
+}
+
+// Anillo de foco translúcido en el campo activo.
+.mat-mdc-form-field.mat-focused .mdc-notched-outline {
+  border-radius: var(--radio);
+  box-shadow: var(--anillo-foco);
+}
+
+// Fechas, montos y códigos: todas las cifras del mismo ancho, para que las columnas se alineen.
+.numero {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Montos: a la derecha (en la celda y en su encabezado).
+.alinear-derecha {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+// Tablas: sin rayas, resaltado suave al pasar el mouse, cifras del mismo ancho.
+.mat-mdc-table {
+  font-variant-numeric: tabular-nums;
+
+  .mat-mdc-header-row {
+    background: var(--color-encabezado-tabla);
+  }
+
+  .mat-mdc-row:hover {
+    background: var(--color-fila-hover);
+  }
+
+  .mat-mdc-row:last-child .mat-mdc-cell {
+    border-bottom: 0;
+  }
+
+  // Material alinea sus celdas a la izquierda con más peso que la clase común.
+  .alinear-derecha {
+    text-align: right;
+  }
+}
+
+// En el celular, la lista pasa de tabla a tarjetas: toda la tarjeta abre la ficha.
+// `<ul class="lista-tarjetas"><li><a class="tarjeta-fila" routerLink="…">
+//   <span class="tarjeta-fila__cuerpo"><span class="tarjeta-fila__titulo">Nombre <span class="estado …">…</span></span>
+//   <span class="tarjeta-fila__secundario">…</span></span><app-icono nombre="siguiente" /></a></li></ul>`
+.lista-tarjetas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tarjeta-fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-fila-hover);
+  }
+
+  > app-icono {
+    flex: none;
+    color: var(--color-texto-tenue);
+  }
+
+  &__cuerpo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__titulo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  &__secundario {
+    color: var(--color-texto-secundario);
+  }
+}
+
+// Celda de dos líneas: el dato principal y, debajo, uno que lo acompaña (correo, código).
+.celda-doble {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  line-height: 1.35;
+
+  &__secundario {
+    color: var(--color-texto-secundario);
+  }
+}
+
+// Estado de un registro: `<span class="estado estado--exito">Activo</span>`. El texto dice el
+// estado (nada depende solo del color).
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  // Un punto del mismo color delante del texto.
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentcolor;
+  }
+
+  &--exito {
+    background: var(--estado-exito-fondo);
+    color: var(--estado-exito);
+  }
+
+  &--neutro {
+    background: var(--estado-neutro-fondo);
+    color: var(--estado-neutro);
+  }
+
+  &--aviso {
+    background: var(--estado-aviso-fondo);
+    color: var(--estado-aviso);
+  }
+
+  &--peligro {
+    background: var(--estado-peligro-fondo);
+    color: var(--estado-peligro);
+  }
+}
+
+// Círculo con las iniciales de una persona (cabecera, listas, fichas). Decorativo: el nombre va
+// siempre al lado. `<span class="iniciales" aria-hidden="true">AP</span>`; más grande:
+// `iniciales iniciales--grande`.
+.iniciales {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-primario-suave);
+  color: var(--color-primario);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+
+  &--grande {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// El mensaje del backend arriba del botón de un formulario, dentro de su `role="alert"`.
+// `<p class="mensaje-error"><app-icono nombre="alerta" [tamano]="18" /><span>…</span></p>`
+.mensaje-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: var(--radio);
+  background: var(--estado-peligro-fondo);
+  color: var(--estado-peligro);
+  line-height: 1.45;
+
+  app-icono {
+    margin-top: 1px;
+  }
+}
+
+// Texto que no se ve pero lee el lector de pantalla (por ejemplo, «cumplido» junto a una regla).
+.oculto-visual {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Acción que quita algo (desactivar, quitar acceso): botón con borde y texto rojos.
+// `<button matButton="outlined" class="boton-peligro">Desactivar</button>`
+.boton-peligro {
+  @include mat.button-overrides(
+    (
+      outlined-outline-color: var(--estado-peligro),
+      outlined-label-text-color: var(--estado-peligro),
+      outlined-state-layer-color: var(--estado-peligro),
+    )
+  );
+}
+
+// Pie de una ficha: quién la creó y quién la modificó por última vez.
+.pie-ficha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-borde);
+  color: var(--color-texto-secundario);
+
+  &:empty {
+    display: none;
+  }
+}
+
+// «Ver historia» en el pie de una ficha, a la derecha (con `.enlace`).
+.pie-ficha__enlace {
+  margin-left: auto;
+}
+
+// Un enlace dentro de un texto («Ver su ficha», «Volver a su ficha»): en el color de la marca.
+.enlace {
+  border-radius: 4px;
+  color: var(--color-primario);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primario-oscuro);
+    text-decoration: underline;
+  }
+}
+
+// ── Menú del usuario (cabecera) ─────────────────────────────────────────────────────────────────
+// Aquí y no en el layout: el botón lo dibujan dos componentes (el definitivo y el provisional del
+// `@defer`) y el menú lo pone Material fuera del layout.
+// El botón del menú del usuario: iniciales, nombre y, debajo, «Administrador» o su usuario.
+.cabecera__usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px 0 6px;
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not(:disabled),
+  &[aria-expanded='true'] {
+    border-color: var(--color-borde-campo);
+    background: var(--color-fondo);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  // En el celular, solo las iniciales.
+  @media (max-width: 599.98px) {
+    padding: 0 6px;
+    border-color: transparent;
+
+    .cabecera__flecha {
+      display: none;
+    }
+  }
+}
+
+.cabecera__quien {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+
+  > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 599.98px) {
+    display: none;
+  }
+}
+
+.cabecera__nombre {
+  font-weight: 600;
+}
+
+.cabecera__detalle {
+  color: var(--color-texto-secundario);
+}
+
+.cabecera__flecha {
+  color: var(--color-texto-secundario);
+}
+
+// El menú desplegado: blanco (Material lo pone gris claro, con el color de superficie del tema).
+.mat-mdc-menu-panel.menu-usuario {
+  @include mat.menu-overrides(
+    (
+      container-color: var(--color-superficie),
+      item-hover-state-layer-color: var(--color-texto),
+    )
+  );
+
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-flotante);
+
+  .mat-mdc-menu-content {
+    padding: 0;
+  }
+}
+
+.menu-usuario__quien {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.menu-usuario__nombres,
+.menu-usuario__empresa {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.menu-usuario__nombre,
+.menu-usuario__valor {
+  font-weight: 600;
+}
+
+.menu-usuario__cuenta,
+.menu-usuario__etiqueta {
+  color: var(--color-texto-secundario);
+}
+
+.menu-usuario__empresa {
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-borde-suave);
+}
+
+.menu-usuario__acciones {
+  padding: 6px;
+  border-top: 1px solid var(--color-borde-suave);
+
+  .mat-mdc-menu-item {
+    min-height: 44px;
+    border-radius: 8px;
+  }
+
+  .mat-mdc-menu-item-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+// «Cambiar de empresa» con cuántas tiene, a la derecha.
+.menu-usuario__texto {
+  flex: 1;
+}
+
+.menu-usuario__cuantas {
+  color: var(--color-texto-tenue);
+  font-size: 14px;
+}
+
+// «Salir» en rojo: termina lo que se está haciendo.
+.menu-usuario__salir.mat-mdc-menu-item,
+.menu-usuario__salir .mat-mdc-menu-item-text {
+  color: var(--estado-peligro);
+}
+
+// El menú «Acciones» de una ficha (6.12b3): blanco como el del usuario, opciones de 44 px y, después
+// de una línea, las que quitan algo en rojo (`.menu-acciones__peligro`).
+.mat-mdc-menu-panel.menu-acciones {
+  @include mat.menu-overrides(
+    (
+      container-color: var(--color-superficie),
+      item-hover-state-layer-color: var(--color-texto),
+    )
+  );
+
+  min-width: 260px;
+  max-width: calc(100vw - 32px);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-flotante);
+
+  .mat-mdc-menu-content {
+    padding: 6px;
+  }
+
+  .mat-mdc-menu-item {
+    min-height: 44px;
+    border-radius: 8px;
+  }
+
+  .mat-mdc-menu-item-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.menu-acciones__separador {
+  margin: 6px 0;
+  border-top: 1px solid var(--color-borde-suave);
+}
+
+.menu-acciones__peligro.mat-mdc-menu-item,
+.menu-acciones__peligro .mat-mdc-menu-item-text {
+  color: var(--estado-peligro);
+}
+
+// El nombre de una opción del menú estrecho, a su derecha (EtiquetaLateralDirective). Va al final
+// del <body>, con posición fija, para que el borde del menú no la corte.
+.etiqueta-lateral {
+  position: fixed;
+  z-index: 1100;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--color-menu);
+  box-shadow: var(--sombra-flotante);
+  color: var(--color-menu-texto);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+// Avisos y confirmaciones (paso 5.11): al abrir un aviso de éxito el foco va a la ventana misma
+// (para que el lector de pantalla la lea); no se dibuja un borde alrededor.
+.panel-aviso .cdk-dialog-container:focus {
+  outline: none;
+}
+
+// Una ventana que sube desde abajo en el celular (cambiar de empresa): el CDK la centra con flex;
+// esto la baja al borde inferior.
+.panel-hoja {
+  align-self: flex-end;
+}

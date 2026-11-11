@@ -1,0 +1,14 @@
+packages:
+  - 'apps/*'
+# Versiones exactas al instalar (pnpm add x deja "1.2.3", sin ^). pnpm 12 ya no lo lee del .npmrc.
+saveExact: true
+allowBuilds:
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  # Viene con swagger-ui-dist: al instalarse manda estadísticas de uso a su fabricante. No.
+  '@scarf/scarf': false
+  '@swc/core': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  prisma: true

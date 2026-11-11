@@ -1,0 +1,139 @@
+@use '../../avisos/dialogo';
+
+:host {
+  @include dialogo.panel;
+}
+
+// En el celular sube desde abajo: esquinas de arriba redondeadas y «Cancelar» a todo el ancho.
+:host(.selector--celular) {
+  padding: 8px 16px 24px;
+  border-radius: 20px 20px 0 0;
+}
+
+.selector__asa {
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 4px auto 16px;
+  border-radius: 4px;
+  background: var(--color-borde, #e3e8ef);
+}
+
+.selector__titulo {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.selector__texto {
+  margin: 0 0 16px;
+  color: var(--color-texto-secundario, #526075);
+  font-size: 14px;
+}
+
+.selector__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 55vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.empresa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-borde, #e3e8ef);
+  border-radius: var(--radio-tarjeta, 12px);
+  background: var(--color-superficie, #fff);
+  color: var(--color-texto, #0f172a);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-fila-hover, #f3f6fa);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--anillo-foco);
+  }
+
+  &[aria-disabled='true'] {
+    cursor: progress;
+  }
+
+  // La activa: borde azul de 2 px, fondo marcado y el ✓ (no solo color).
+  &--activa {
+    padding: 7px 13px;
+    border: 2px solid var(--color-primario, #1f4fbf);
+    background: var(--color-primario-suave, #e8eefb);
+
+    &:hover {
+      background: var(--color-primario-suave, #e8eefb);
+    }
+  }
+}
+
+.empresa__sigla {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--color-primario-suave, #e8eefb);
+  color: var(--color-primario, #1f4fbf);
+  font-size: 14px;
+  font-weight: 700;
+
+  // Como el recuadro del menú lateral: dorado con letras azul muy oscuro.
+  .empresa--activa & {
+    background: var(--color-acento, #c9a646);
+    color: var(--color-menu, #0a1a33);
+  }
+}
+
+.empresa__texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.empresa__nombre {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.empresa__estado {
+  color: var(--color-primario, #1f4fbf);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.empresa__marca {
+  color: var(--color-primario, #1f4fbf);
+}
+
+.selector__acciones {
+  @include dialogo.acciones;
+}
+
+.boton {
+  @include dialogo.boton;
+}
+
+:host(.selector--celular) .boton {
+  flex: 1 1 100%;
+  min-height: 48px;
+}

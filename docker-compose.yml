@@ -1,0 +1,41 @@
+name: base-erp
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: base-erp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-base_erp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-base_erp_local}
+      POSTGRES_DB: ${POSTGRES_DB:-base_erp}
+      TZ: America/Guayaquil
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - postgres-datos:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: base-erp-redis
+    restart: unless-stopped
+    # appendonly: Redis guarda en disco cada cambio; las colas no se pierden si se reinicia.
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '127.0.0.1:${REDIS_PORT:-6380}:6379'
+    volumes:
+      - redis-datos:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-datos:
+  redis-datos:

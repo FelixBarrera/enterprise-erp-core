@@ -1,0 +1,47 @@
+@if (datos.enCelular) {
+  <span class="selector__asa" aria-hidden="true"></span>
+}
+<h2 class="selector__titulo" [id]="datos.idTitulo">Cambiar de empresa</h2>
+<p class="selector__texto" [id]="datos.idTexto">
+  La página se vuelve a cargar con los datos de la empresa que elija.
+</p>
+
+<ul class="selector__lista" aria-label="Empresas">
+  @for (empresa of usuario.empresas(); track empresa.id) {
+    @let activa = empresa.id === usuario.empresaActivaId();
+    <li>
+      <button
+        type="button"
+        class="empresa"
+        [class.empresa--activa]="activa"
+        [attr.aria-current]="activa ? 'true' : null"
+        [attr.aria-disabled]="cambiandoA() !== null ? 'true' : null"
+        (click)="elegir(empresa.id)"
+      >
+        <span class="empresa__sigla" aria-hidden="true">{{ iniciales(empresa.nombre) }}</span>
+        <span class="empresa__texto">
+          <span class="empresa__nombre">{{ empresa.nombre }}</span>
+          @if (activa) {
+            <span class="empresa__estado">Empresa activa</span>
+          } @else if (cambiandoA() === empresa.id) {
+            <span class="empresa__estado" role="status">Cambiando…</span>
+          }
+        </span>
+        @if (activa) {
+          <app-icono nombre="listo" class="empresa__marca" [tamano]="20" />
+        }
+      </button>
+    </li>
+  }
+</ul>
+
+<div class="selector__acciones">
+  <button
+    type="button"
+    class="boton boton--secundario"
+    [attr.aria-disabled]="cambiandoA() !== null ? 'true' : null"
+    (click)="cerrar()"
+  >
+    Cancelar
+  </button>
+</div>

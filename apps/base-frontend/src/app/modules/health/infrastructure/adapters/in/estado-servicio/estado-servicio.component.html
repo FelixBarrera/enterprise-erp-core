@@ -1,0 +1,8 @@
+<h1 class="titulo-pagina">Inicio</h1>
+<section class="estado-servicio" [attr.aria-busy]="cargando()">
+  @if (cargando()) {
+    <p role="status">Revisando el sistema…</p>
+  } @else if (resumen(); as r) {
+    <p role="status" class="mensaje" [class.mensaje--falla]="!r.disponible">{{ r.mensaje }}</p>
+  }
+</section>

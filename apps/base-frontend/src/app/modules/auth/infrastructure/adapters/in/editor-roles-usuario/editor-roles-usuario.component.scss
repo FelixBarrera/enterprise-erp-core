@@ -1,0 +1,127 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  max-width: 880px;
+}
+
+.editor-roles {
+  padding: 0;
+  overflow: hidden;
+}
+
+.editor-roles__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-borde-suave);
+  background: var(--color-encabezado-tabla);
+}
+
+.editor-roles__titulo {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.editor-roles__total {
+  color: var(--color-texto-secundario);
+
+  strong {
+    color: var(--color-texto);
+  }
+}
+
+.editor-roles__lista {
+  margin: 0;
+  padding: 6px 8px;
+  list-style: none;
+}
+
+// La casilla con el nombre; debajo, la descripción; a la derecha, la nota.
+.editor-roles__rol {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 52px;
+  padding: 4px 8px 6px 0;
+}
+
+.editor-roles__nombre {
+  font-weight: 600;
+}
+
+.editor-roles__descripcion {
+  grid-column: 1;
+  padding-left: 44px;
+  margin-top: -8px;
+  color: var(--color-texto-secundario);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.editor-roles__nota {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  max-width: 260px;
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+  text-align: right;
+
+  &--cambio {
+    color: var(--estado-aviso);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+.editor-roles__vacio {
+  padding: 12px 8px;
+  color: var(--color-texto-secundario);
+}
+
+// Un rol desactivado que el usuario conserva: la casilla en gris aunque esté marcada.
+.editor-roles__rol--desactivado {
+  @include mat.checkbox-overrides(
+    (
+      selected-icon-color: var(--color-borde-campo),
+      selected-hover-icon-color: var(--color-borde-campo),
+      selected-focus-icon-color: var(--color-borde-campo),
+      selected-pressed-icon-color: var(--color-borde-campo),
+    )
+  );
+}
+
+// Solo lectura (su propia ficha, o sin «Asignar roles»): las casillas con su color de siempre.
+:host(.editor-roles--solo-lectura) {
+  @include mat.checkbox-overrides(
+    (
+      disabled-label-color: var(--color-texto),
+      disabled-selected-icon-color: var(--color-primario),
+      disabled-selected-checkmark-color: #fff,
+      disabled-unselected-icon-color: var(--color-borde-campo),
+    )
+  );
+}
+
+@media (max-width: 599.98px) {
+  .editor-roles__rol {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 48px;
+  }
+
+  .editor-roles__nota {
+    grid-column: 1;
+    grid-row: auto;
+    max-width: none;
+    padding-left: 44px;
+    text-align: left;
+  }
+}

@@ -1,0 +1,153 @@
+<div class="login">
+  <aside class="login__marca">
+    <!-- Dibujo de fondo (de la marca, sección 8.6): una cuadrícula y dos líneas que suben, muy tenues. -->
+    <svg
+      class="login__fondo"
+      aria-hidden="true"
+      focusable="false"
+      viewBox="0 0 600 900"
+      preserveAspectRatio="none"
+    >
+      <g class="login__cuadricula">
+        <line x1="0" y1="150" x2="600" y2="150" />
+        <line x1="0" y1="300" x2="600" y2="300" />
+        <line x1="0" y1="450" x2="600" y2="450" />
+        <line x1="0" y1="600" x2="600" y2="600" />
+        <line x1="0" y1="750" x2="600" y2="750" />
+        <line x1="120" y1="0" x2="120" y2="900" />
+        <line x1="240" y1="0" x2="240" y2="900" />
+        <line x1="360" y1="0" x2="360" y2="900" />
+        <line x1="480" y1="0" x2="480" y2="900" />
+      </g>
+      <polyline
+        class="login__linea-dorada"
+        points="0,720 60,700 120,712 180,660 240,676 300,610 360,630 420,560 480,585 540,520 600,500"
+      />
+      <polyline
+        class="login__linea-clara"
+        points="0,780 60,770 120,790 180,750 240,760 300,720 360,735 420,700 480,712 540,680 600,670"
+      />
+    </svg>
+
+    <app-marca tono="claro" tamano="grande" />
+
+    <div class="login__mensaje">
+      <p class="login__antetitulo">{{ marca.login.antetitulo }}</p>
+      <p class="login__lema">{{ marca.login.lema }}</p>
+      <p class="login__descripcion">{{ marca.login.descripcion }}</p>
+    </div>
+
+    <p class="login__aviso">
+      <app-icono nombre="escudo" [tamano]="16" />
+      <span>Acceso solo para personal autorizado. Cada acción queda registrada.</span>
+    </p>
+  </aside>
+
+  <main class="login__lado">
+    <div class="login__contenido">
+      <app-marca class="login__marca-celular" />
+
+      <h1 class="login__titulo">Ingrese a su cuenta</h1>
+      <p class="login__subtitulo">Use el usuario y la contraseña que le dio el administrador.</p>
+
+      <form
+        class="login__formulario"
+        [formGroup]="formulario"
+        (ngSubmit)="entrar()"
+        novalidate
+        [attr.aria-busy]="enviando()"
+      >
+        <div class="campo">
+          <label class="etiqueta" for="login-usuario">Usuario</label>
+          <mat-form-field>
+            <app-icono matPrefix nombre="usuario" class="campo__icono" [tamano]="18" />
+            <input
+              #campoUsuario
+              matInput
+              id="login-usuario"
+              formControlName="nombreUsuario"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              [attr.aria-describedby]="
+                formulario.controls.nombreUsuario.touched &&
+                formulario.controls.nombreUsuario.invalid
+                  ? 'login-usuario-error'
+                  : null
+              "
+            />
+            @if (formulario.controls.nombreUsuario.hasError('obligatorio')) {
+              <mat-error id="login-usuario-error">Escriba su usuario</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="campo">
+          <label class="etiqueta" for="login-contrasena">Contraseña</label>
+          <mat-form-field>
+            <app-icono matPrefix nombre="candado" class="campo__icono" [tamano]="18" />
+            <input
+              #campoContrasena
+              matInput
+              id="login-contrasena"
+              formControlName="contrasena"
+              autocomplete="current-password"
+              [type]="verContrasena() ? 'text' : 'password'"
+              [attr.aria-describedby]="
+                formulario.controls.contrasena.touched && formulario.controls.contrasena.invalid
+                  ? 'login-contrasena-error'
+                  : null
+              "
+            />
+            <button
+              matIconButton
+              matSuffix
+              type="button"
+              [attr.aria-label]="
+                verContrasena() ? 'Ocultar la contraseña' : 'Mostrar la contraseña'
+              "
+              [attr.aria-pressed]="verContrasena()"
+              (click)="alternarVerContrasena()"
+            >
+              <app-icono [nombre]="verContrasena() ? 'ocultar' : 'ver'" [tamano]="18" />
+            </button>
+            @if (formulario.controls.contrasena.hasError('obligatorio')) {
+              <mat-error id="login-contrasena-error">Escriba su contraseña</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div role="alert">
+          @if (error(); as mensaje) {
+            <p class="mensaje-error">
+              <app-icono nombre="alerta" [tamano]="18" />
+              <span>{{ mensaje }}</span>
+            </p>
+          }
+        </div>
+
+        <button
+          matButton="filled"
+          type="submit"
+          class="login__entrar"
+          [disabled]="enviando()"
+          [disabledInteractive]="true"
+        >
+          <span class="login__entrar-texto">
+            {{ enviando() ? 'Ingresando…' : 'Ingresar' }}
+            @if (!enviando()) {
+              <app-icono nombre="flecha-derecha" [tamano]="18" />
+            }
+          </span>
+        </button>
+      </form>
+
+      <div class="login__ayuda">
+        <p class="login__ayuda-titulo">¿Olvidó su contraseña?</p>
+        <p>Pida al administrador de su empresa una contraseña temporal.</p>
+      </div>
+    </div>
+
+    <p class="login__pie">{{ marca.nombre }}</p>
+  </main>
+</div>

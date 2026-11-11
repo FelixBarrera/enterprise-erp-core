@@ -1,0 +1,17 @@
+<div class="aviso__cuerpo">
+  <svg class="aviso__icono" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+    @if (datos.tipo === 'error') {
+      <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2v2Zm0-4h-2V7h2v6Z" />
+    } @else {
+      <path
+        d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-2 15-5-5 1.4-1.4 3.6 3.6 7.6-7.6L19 8l-9 9Z"
+      />
+    }
+  </svg>
+  <p class="aviso__texto" [id]="datos.idTexto">{{ datos.texto }}</p>
+</div>
+@if (datos.tipo === 'error') {
+  <div class="aviso__acciones">
+    <button type="button" class="boton boton--primario" (click)="cerrar()">Aceptar</button>
+  </div>
+}

@@ -1,0 +1,140 @@
+@use '../../../../../../shared/infrastructure/avisos/dialogo';
+
+:host {
+  @include dialogo.panel;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: var(--radio-grande, 16px);
+}
+
+.contrasena-temporal__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contrasena-temporal__marca {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--estado-exito-fondo, #e6f4ec);
+  color: var(--estado-exito, #126b3e);
+}
+
+.contrasena-temporal__titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.contrasena-temporal__texto {
+  margin: 0;
+  color: var(--color-texto, #0f172a);
+}
+
+.contrasena-temporal__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contrasena-temporal__etiqueta {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.contrasena-temporal__caja {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 16px;
+  border: 1px solid var(--color-borde-campo, #8792a4);
+  border-radius: var(--radio-tarjeta, 12px);
+  background: var(--color-encabezado-tabla, #f8fafc);
+}
+
+// Letra de ancho fijo: que se distinga cada carácter al dictarla o copiarla a mano.
+.contrasena-temporal__valor {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.boton {
+  @include dialogo.boton;
+}
+
+.contrasena-temporal__copiar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-weight: 600;
+
+  &--hecho {
+    border-color: var(--estado-exito, #126b3e);
+    color: var(--estado-exito, #126b3e);
+  }
+}
+
+.contrasena-temporal__estado {
+  min-height: 21px;
+  color: var(--estado-exito, #126b3e);
+  font-size: 14px;
+
+  &--fallo {
+    color: var(--estado-peligro, #b42318);
+  }
+}
+
+.contrasena-temporal__aviso {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radio, 10px);
+  background: var(--estado-aviso-fondo, #fff3dc);
+  color: var(--estado-aviso, #8a5100);
+  font-size: 14px;
+
+  app-icono {
+    flex: none;
+    margin-top: 2px;
+  }
+}
+
+.contrasena-temporal__acciones {
+  @include dialogo.acciones;
+
+  margin-top: 0;
+
+  .boton {
+    min-height: 44px;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 599.98px) {
+  :host {
+    padding: 20px 16px;
+  }
+
+  .contrasena-temporal__valor {
+    font-size: 20px;
+  }
+}

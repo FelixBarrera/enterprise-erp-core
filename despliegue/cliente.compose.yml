@@ -1,0 +1,48 @@
+# La copia de la API de un cliente. Todas usan la misma imagen; cambia solo su .env.
+#
+#   CLIENTE=cliente1 docker compose -f cliente.compose.yml run --rm migrador   # preparar tablas
+#   CLIENTE=cliente1 docker compose -f cliente.compose.yml up -d api           # levantar
+#   docker exec -it cliente1-api node dist/comandos/admin-crear-inicial.js      # comandos admin:*
+#
+# Lee despliegue/clientes/<cliente>/api.env (la API, con el usuario de la base de permisos
+# mínimos) y migrador.env (solo DATABASE_URL, con el usuario dueño de las tablas).
+# Nginx la encuentra por el nombre del contenedor: <cliente>-api.
+
+name: cliente-${CLIENTE:?Falta CLIENTE (ej. CLIENTE=cliente1)}
+
+x-registro: &registro
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '5'
+
+services:
+  api:
+    image: base-api:${VERSION:-latest}
+    container_name: ${CLIENTE}-api
+    restart: unless-stopped
+    <<: *registro
+    env_file: clientes/${CLIENTE}/api.env
+    # Sin poder escribir en su propio disco ni ganar permisos: solo /tmp, en memoria.
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    networks: [erp]
+
+  migrador:
+    image: base-migrador:${VERSION:-latest}
+    profiles: [migrar]
+    restart: 'no'
+    <<: *registro
+    env_file: clientes/${CLIENTE}/migrador.env
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    networks: [erp]
+
+networks:
+  erp:
+    external: true

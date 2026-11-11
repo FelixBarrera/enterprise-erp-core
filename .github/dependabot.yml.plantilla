@@ -1,0 +1,61 @@
+# Dependabot: revisa actualizaciones cada lunes temprano.
+# Menores y parches llegan agrupados por familia.
+# Las MAYORES también llegan juntas por familia (Angular con Material y CDK; Vitest con su
+# cobertura), en un PR aparte: subir un paquete solo rompe el resto. No se mergean de
+# inmediato: se leen sus notas de cambio y se hacen en un paso propio.
+# Varias menores a la vez se juntan en un solo PR propio (CLAUDE.md, reglas de GitHub).
+version: 2
+updates:
+  - package-ecosystem: npm   # sirve para pnpm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Guayaquil
+    open-pull-requests-limit: 10
+    groups:
+      angular:
+        patterns: ['@angular/*', '@angular-devkit/*']
+        update-types: [minor, patch]
+      nestjs:
+        patterns: ['@nestjs/*', '@nestjs-cls/*', 'nestjs-*']
+        update-types: [minor, patch]
+      prisma:
+        patterns: ['prisma', '@prisma/*']
+        update-types: [minor, patch]
+      herramientas:
+        patterns: ['vitest', '@vitest/*', 'oxlint', 'oxlint-tsgolint', 'prettier', 'typescript', '@swc/*', 'unplugin-swc', 'vite', 'jsdom', 'supertest', '@types/*']
+        update-types: [minor, patch]
+      angular-mayor:
+        patterns: ['@angular/*', '@angular-devkit/*']
+        update-types: [major]
+      nestjs-mayor:
+        patterns: ['@nestjs/*', '@nestjs-cls/*', 'nestjs-*']
+        update-types: [major]
+      prisma-mayor:
+        patterns: ['prisma', '@prisma/*']
+        update-types: [major]
+      vitest-mayor:
+        patterns: ['vitest', '@vitest/*']
+        update-types: [major]
+    ignore:
+      # Los tipos de Node siguen la versión de Node del proyecto (.nvmrc).
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # TypeScript sube de versión mayor en un paso propio (la 7 cambia el compilador).
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      # Librería crítica (si se usa): se revisa a mano.
+      - dependency-name: 'sri-ec'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Guayaquil
+    groups:
+      acciones:
+        patterns: ['*']

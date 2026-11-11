@@ -1,0 +1,154 @@
+// Reglas por capas (docs/arquitectura-backend.md, sección 2).
+// OJO: en cada lista de "patterns", el patrón con excepciones ("!...") va SIEMPRE al final:
+// si va antes, oxlint deja de revisar los patrones que siguen.
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import"
+  ],
+  "env": {
+    "node": true
+  },
+  "ignorePatterns": [
+    "src/generated/**",
+    "dist/**",
+    "coverage/**"
+  ],
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "error",
+    "no-console": "error",
+    "import/no-cycle": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@nestjs/common",
+            "importNames": [
+              "forwardRef"
+            ],
+            "message": "No se usa forwardRef: invertir la dependencia con un puerto (docs/arquitectura-backend.md, sección 3)."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/modules/*/infrastructure/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@nestjs/common",
+                "importNames": [
+                  "forwardRef"
+                ],
+                "message": "No se usa forwardRef: invertir la dependencia con un puerto (docs/arquitectura-backend.md, sección 3)."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "/prisma/prisma\\.service(\\.js)?$",
+                "message": "Los módulos no usan PrismaService: inyectar TransaccionPrisma (shared/infrastructure/transacciones/) y usar this.txHost.tx, para unirse a la transacción en curso."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/modules/*/domain/**",
+        "src/shared/domain/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@nestjs/common",
+                "importNames": [
+                  "forwardRef"
+                ],
+                "message": "No se usa forwardRef: invertir la dependencia con un puerto (docs/arquitectura-backend.md, sección 3)."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "/(application|infrastructure|generated)(/|$)",
+                "message": "domain/ no depende de application/ ni de infrastructure/."
+              },
+              {
+                "regex": "/modules(/|$)",
+                "message": "shared/ no depende de los módulos."
+              },
+              {
+                "group": [
+                  "*",
+                  "!./**",
+                  "!../**"
+                ],
+                "message": "domain/ es puro: sin NestJS, Prisma ni librerías. Solo su dominio y shared/domain/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/modules/*/application/**",
+        "src/shared/application/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@nestjs/common",
+                "importNames": [
+                  "forwardRef"
+                ],
+                "message": "No se usa forwardRef: invertir la dependencia con un puerto (docs/arquitectura-backend.md, sección 3)."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "/(infrastructure|generated)(/|$)",
+                "message": "application/ no depende de infrastructure/: usar un puerto."
+              },
+              {
+                "regex": "/application/(use-cases|ports/out)(/|$)",
+                "message": "De otro módulo solo se usan sus puertos de entrada (application/ports/in/)."
+              },
+              {
+                "regex": "/modules(/|$)",
+                "message": "shared/ no depende de los módulos."
+              },
+              {
+                "group": [
+                  "*",
+                  "!@nestjs/common",
+                  "!./**",
+                  "!../**"
+                ],
+                "message": "application/ no usa librerías (solo @nestjs/common para @Injectable e @Inject). Lo externo va detrás de un puerto."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

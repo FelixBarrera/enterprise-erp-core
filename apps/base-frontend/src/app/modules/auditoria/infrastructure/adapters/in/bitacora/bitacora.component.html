@@ -1,0 +1,245 @@
+<app-barra-carga [activa]="listado.cargando()" />
+
+<header class="encabezado-pagina">
+  <div>
+    <h1 class="titulo-pagina">Bitácora</h1>
+    @if (!enCelular()) {
+      <p class="subtitulo-pagina">
+        Lo que se hizo{{ nombreEmpresa() ? ' en ' + nombreEmpresa() : '' }}, quién lo hizo y cuándo.
+        No se puede cambiar ni borrar.
+      </p>
+    }
+  </div>
+</header>
+
+@if (historia(); as historia) {
+  <section class="bitacora__historia" aria-label="Historia de un registro">
+    <app-icono nombre="historia" [tamano]="20" />
+    <p class="bitacora__historia-texto">
+      @if (historia.nombre === null) {
+        {{ historia.inicio }}: todo lo que se hizo con él en esta empresa.
+      } @else {
+        {{ historia.inicio }} <strong>{{ historia.nombre }}</strong
+        >: todo lo que se hizo con él en esta empresa.
+      }
+    </p>
+    @if (historia.ficha; as ficha) {
+      <a class="enlace" [routerLink]="ficha.ruta">Volver a su ficha</a>
+    }
+    <a matButton="outlined" routerLink="/bitacora">
+      <app-icono nombre="cerrar" [tamano]="16" />
+      Ver toda la bitácora
+    </a>
+  </section>
+}
+
+@if (enCelular()) {
+  <div class="bitacora__barra-celular">
+    <span class="bitacora__rango numero">
+      <app-icono nombre="calendario" [tamano]="16" />
+      {{ rango() }}
+    </span>
+    <button
+      matButton="outlined"
+      type="button"
+      class="bitacora__boton-filtros"
+      [attr.aria-expanded]="verFiltros()"
+      aria-controls="bitacora-filtros"
+      [attr.aria-label]="
+        listado.filtrosActivos() > 0
+          ? 'Filtros: ' +
+            listado.filtrosActivos() +
+            (listado.filtrosActivos() === 1 ? ' activo' : ' activos')
+          : 'Filtros'
+      "
+      (click)="alternarFiltros()"
+    >
+      <app-icono nombre="filtros" [tamano]="18" />
+      Filtros
+      @if (listado.filtrosActivos() > 0) {
+        <span class="bitacora__burbuja" aria-hidden="true">{{ listado.filtrosActivos() }}</span>
+      }
+    </button>
+  </div>
+  @if (verFiltros()) {
+    <section id="bitacora-filtros" class="tarjeta bitacora__filtros-celular" aria-label="Filtros">
+      <ng-container [ngTemplateOutlet]="campos" />
+    </section>
+  }
+
+  <ul class="lista-tarjetas" aria-label="Eventos de la bitácora">
+    @for (evento of eventos(); track evento.id) {
+      <li>
+        <a class="tarjeta-fila" [routerLink]="[evento.id]">
+          <span class="tarjeta-fila__cuerpo">
+            <span class="tarjeta-fila__titulo">
+              {{ textoAccion(evento.accion) }}
+              @if (esDeSeguridad(evento.accion)) {
+                <span class="estado estado--peligro">Seguridad</span>
+              }
+            </span>
+            @if (textoSobreQue(evento); as sobre) {
+              <span class="tarjeta-fila__secundario">{{ sobre }}</span>
+            }
+            <span class="tarjeta-fila__secundario">
+              <span class="numero">{{ evento.ocurridoEn | fechaHora }}</span> ·
+              {{ textoQuien(evento) }}
+            </span>
+          </span>
+          <app-icono nombre="siguiente" [tamano]="18" />
+        </a>
+      </li>
+    }
+  </ul>
+  <app-estado-lista
+    [listado]="listado"
+    vacio="No pasó nada en esas fechas."
+    vacioConFiltros="Ningún evento coincide con los filtros."
+  />
+  <app-paginador [listado]="listado" />
+} @else {
+  <section class="tarjeta bitacora__filtros" aria-labelledby="bitacora-titulo-filtros">
+    <div class="tarjeta__cabecera">
+      <div class="bitacora__titulo-filtros">
+        <h2 id="bitacora-titulo-filtros" class="tarjeta__titulo">Filtros</h2>
+        @if (listado.filtrosActivos() > 0) {
+          <span class="contador">
+            {{ listado.filtrosActivos() }}
+            {{ listado.filtrosActivos() === 1 ? 'activo' : 'activos' }}
+          </span>
+        }
+      </div>
+    </div>
+    <div class="bitacora__campos">
+      <ng-container [ngTemplateOutlet]="campos" />
+    </div>
+  </section>
+
+  <section class="tarjeta tarjeta--tabla" aria-label="Eventos de la bitácora">
+    <table mat-table [dataSource]="eventos()" [trackBy]="identificar">
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef class="bitacora__fecha">Fecha y hora</th>
+        <td mat-cell *matCellDef="let evento" class="bitacora__fecha">
+          <span class="numero">{{ evento.ocurridoEn | fechaHora }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="quien">
+        <th mat-header-cell *matHeaderCellDef class="bitacora__quien">Quién</th>
+        <td mat-cell *matCellDef="let evento" class="bitacora__quien">
+          <span [class.bitacora__sistema]="evento.nombreUsuario === null">{{
+            textoQuien(evento)
+          }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="accion">
+        <th mat-header-cell *matHeaderCellDef>Qué hizo</th>
+        <td mat-cell *matCellDef="let evento">
+          <span class="bitacora__accion">
+            <a class="bitacora__texto-accion" [routerLink]="[evento.id]">{{
+              textoAccion(evento.accion)
+            }}</a>
+            @if (esDeSeguridad(evento.accion)) {
+              <span class="estado estado--peligro">Seguridad</span>
+            }
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="sobre">
+        <th mat-header-cell *matHeaderCellDef class="bitacora__sobre">Sobre qué</th>
+        <td mat-cell *matCellDef="let evento" class="bitacora__sobre">
+          {{ textoSobreQue(evento) }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="abrir">
+        <th mat-header-cell *matHeaderCellDef class="bitacora__abrir">
+          <span class="oculto-visual">Ver detalle</span>
+        </th>
+        <td mat-cell *matCellDef="let evento" class="bitacora__abrir">
+          <app-icono nombre="siguiente" [tamano]="18" />
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let evento; columns: columnas"
+        class="bitacora__fila"
+        (click)="abrir(evento, $event)"
+      ></tr>
+    </table>
+    <app-estado-lista
+      [listado]="listado"
+      vacio="No pasó nada en esas fechas."
+      vacioConFiltros="Ningún evento coincide con los filtros."
+    />
+    <app-paginador [listado]="listado" />
+  </section>
+}
+
+<ng-template #campos>
+  <div class="bitacora__campo-fecha">
+    <label class="etiqueta" for="bitacora-desde">Desde</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <input
+        matInput
+        id="bitacora-desde"
+        type="date"
+        [value]="filtros().desde"
+        (change)="elegirFecha('desde', $event)"
+      />
+    </mat-form-field>
+  </div>
+  <div class="bitacora__campo-fecha">
+    <label class="etiqueta" for="bitacora-hasta">Hasta</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <input
+        matInput
+        id="bitacora-hasta"
+        type="date"
+        [value]="filtros().hasta"
+        (change)="elegirFecha('hasta', $event)"
+      />
+    </mat-form-field>
+  </div>
+  <div class="bitacora__campo-usuario">
+    <label class="etiqueta" id="bitacora-usuario-etiqueta" for="bitacora-usuario">Usuario</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-select
+        id="bitacora-usuario"
+        aria-labelledby="bitacora-usuario-etiqueta"
+        [value]="filtros().usuario"
+        (selectionChange)="elegirUsuario($event.value)"
+      >
+        <mat-option value="">Todos</mat-option>
+        @for (usuario of usuarios(); track usuario.usuarioId) {
+          <mat-option [value]="usuario.usuarioId">{{ usuario.nombreUsuario }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="bitacora__campo-accion">
+    <label class="etiqueta" id="bitacora-accion-etiqueta" for="bitacora-accion">Qué hizo</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-select
+        id="bitacora-accion"
+        aria-labelledby="bitacora-accion-etiqueta"
+        panelClass="bitacora__panel-accion"
+        [value]="filtros().accion"
+        (selectionChange)="elegirAccion($event.value)"
+      >
+        <mat-option value="">Todo</mat-option>
+        @for (grupo of grupos; track grupo.codigo) {
+          <mat-optgroup [label]="grupo.titulo">
+            <mat-option [value]="grupo.codigo">{{ grupo.textoTodo }}</mat-option>
+            @for (accion of grupo.acciones; track accion.codigo) {
+              <mat-option [value]="accion.codigo">{{ accion.texto }}</mat-option>
+            }
+          </mat-optgroup>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  @if (listado.filtrosActivos() > 0) {
+    <button matButton type="button" (click)="listado.limpiarFiltros()">Limpiar filtros</button>
+  }
+  <p class="bitacora__ayuda">{{ ayuda() }}</p>
+</ng-template>

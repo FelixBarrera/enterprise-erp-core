@@ -1,0 +1,96 @@
+:host {
+  display: block;
+}
+
+// Sin `gap`: las tarjetas ya traen su margen de abajo.
+.nuevo-usuario {
+  max-width: 880px;
+  margin-bottom: 16px;
+}
+
+// ── Datos ───────────────────────────────────────────────────────────────────────────────────────
+.nuevo-usuario__datos .tarjeta__titulo {
+  margin-bottom: 14px;
+}
+
+.nuevo-usuario__campo {
+  margin-bottom: 14px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+// ── Pie: el error y los botones, a la vista abajo ───────────────────────────────────────────────
+.nuevo-usuario__pie {
+  position: sticky;
+  bottom: 16px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-flotante);
+}
+
+.nuevo-usuario__error {
+  display: flex;
+  flex: 1 0 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+
+  &:empty {
+    display: none;
+  }
+
+  .mensaje-error {
+    flex: 1 1 320px;
+    margin: 0;
+  }
+}
+
+.nuevo-usuario__falta {
+  flex: 1;
+  color: var(--color-texto-secundario);
+}
+
+.nuevo-usuario__falla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  p {
+    margin: 0;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .nuevo-usuario__pie {
+    bottom: 0;
+    margin-right: -16px;
+    margin-left: -16px;
+    border-radius: 0;
+
+    > a,
+    > button {
+      flex: 1 1 auto;
+      min-height: 48px;
+    }
+  }
+
+  .nuevo-usuario__falta {
+    flex: 1 0 100%;
+  }
+}

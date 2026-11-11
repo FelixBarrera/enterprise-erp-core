@@ -1,0 +1,63 @@
+// Estilos comunes del aviso y la confirmación. Usan las variables del tema (src/styles.scss); los
+// valores de respaldo quedan por si la ventana se abre sin el tema (pruebas).
+
+@mixin panel {
+  display: block;
+  box-sizing: border-box;
+  padding: 20px 24px;
+  border-radius: var(--radio, 8px);
+  background: var(--color-superficie, #fff);
+  color: var(--color-texto, #212529);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 25%);
+  // El diálogo se dibuja fuera de la aplicación (al final del <body>): no hereda su fuente.
+  font-family: var(--fuente-base, system-ui, sans-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  outline: none;
+}
+
+@mixin acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+@mixin boton {
+  min-width: 96px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radio, 8px);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgb(13 110 253 / 35%);
+  }
+
+  &--primario {
+    background: var(--color-primario, #0f3d73);
+    color: #fff;
+  }
+
+  &--peligro {
+    background: var(--estado-peligro, #b02a37);
+    color: #fff;
+  }
+
+  &--secundario {
+    border-color: var(--color-borde-campo, #868e96);
+    background: var(--color-superficie, #fff);
+    color: var(--color-texto, #212529);
+  }
+
+  // Botones táctiles de 44 px en el celular.
+  @media (max-width: 599px) {
+    min-height: 44px;
+    flex: 1 1 0;
+  }
+}

@@ -1,0 +1,67 @@
+<app-barra-carga [activa]="carga() === 'cargando' || registrando()" />
+
+<app-encabezado-ficha titulo="Nuevo rol" volverA="/roles" textoVolver="Roles">
+  <span fichaDetalle>Póngale un nombre y marque lo que podrá hacer. Se guarda todo junto.</span>
+</app-encabezado-ficha>
+
+@if (carga() === 'error') {
+  <section class="tarjeta nuevo-rol__falla" role="alert">
+    <p>{{ mensajeSinCargar }}</p>
+    <button matButton="outlined" type="button" (click)="cargar()">Reintentar</button>
+  </section>
+} @else if (carga() === 'lista') {
+  <form
+    [formGroup]="formulario"
+    (ngSubmit)="registrar()"
+    novalidate
+    [attr.aria-busy]="registrando()"
+  >
+    <mat-tab-group
+      class="nuevo-rol__pestanas"
+      aria-label="Secciones del rol"
+      animationDuration="0ms"
+      [mat-stretch-tabs]="enCelular()"
+      [(selectedIndex)]="pestana"
+    >
+      <mat-tab label="Datos">
+        <section class="tarjeta nuevo-rol__datos" aria-labelledby="rol-datos">
+          <h2 id="rol-datos" class="tarjeta__titulo">Datos del rol</h2>
+          <app-datos-rol [formulario]="formulario" />
+        </section>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Permisos
+          <span class="nuevo-rol__contador-pestana numero">{{ textoPermisos() }}</span>
+        </ng-template>
+        <app-editor-permisos
+          [catalogo]="catalogo()"
+          [(marcados)]="marcados"
+          [editable]="true"
+          [mostrarCambios]="false"
+          [puedeDar]="puedeDar"
+        />
+      </mat-tab>
+    </mat-tab-group>
+
+    <div class="nuevo-rol__pie">
+      <div role="alert" class="nuevo-rol__error">
+        @if (error(); as mensaje) {
+          <p class="mensaje-error">
+            <app-icono nombre="alerta" [tamano]="18" />
+            <span>{{ mensaje }}</span>
+          </p>
+        }
+      </div>
+      <a matButton="outlined" routerLink="/roles">Cancelar</a>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="registrando()"
+        [disabledInteractive]="true"
+      >
+        {{ registrando() ? 'Registrando…' : 'Registrar rol' }}
+      </button>
+    </div>
+  </form>
+}

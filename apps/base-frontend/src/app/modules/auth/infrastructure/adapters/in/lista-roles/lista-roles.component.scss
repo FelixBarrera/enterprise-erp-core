@@ -1,0 +1,112 @@
+.lista-roles__titulo-filtros {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lista-roles__campos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.lista-roles__campo-buscar {
+  flex: 2 1 280px;
+}
+
+.lista-roles__campo-estado {
+  flex: 1 1 200px;
+}
+
+.lista-roles__rol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lista-roles__simbolo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radio);
+  background: var(--color-primario-suave);
+  color: var(--color-primario);
+
+  &--administrador {
+    background: var(--color-acento-suave);
+    color: var(--color-acento-texto);
+  }
+}
+
+.lista-roles__nombre {
+  color: var(--color-texto);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.lista-roles__fila {
+  cursor: pointer;
+}
+
+.lista-roles__abrir {
+  width: 40px;
+  color: var(--color-texto-tenue);
+}
+
+// ── Celular ─────────────────────────────────────────────────────────────────────────────────────
+.lista-roles__buscador-celular {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lista-roles__buscar {
+  flex: 1;
+  min-width: 0;
+}
+
+.lista-roles__boton-filtros {
+  flex: none;
+  min-width: 44px;
+  height: 44px;
+}
+
+.lista-roles__burbuja {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--color-primario);
+  color: var(--color-superficie);
+  font-size: 12px;
+}
+
+.lista-roles__filtros-celular {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.lista-roles__lupa {
+  margin: 0 4px 0 12px;
+  color: var(--color-texto-tenue);
+}

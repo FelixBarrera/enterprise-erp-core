@@ -1,0 +1,33 @@
+@use '../dialogo';
+
+:host {
+  @include dialogo.panel;
+  --aviso-color: var(--estado-exito, #146c43);
+}
+
+:host(.aviso--error) {
+  --aviso-color: var(--estado-peligro, #b02a37);
+}
+
+.aviso__cuerpo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.aviso__icono {
+  flex: none;
+  fill: var(--aviso-color);
+}
+
+.aviso__texto {
+  margin: 3px 0 0;
+}
+
+.aviso__acciones {
+  @include dialogo.acciones;
+}
+
+.boton {
+  @include dialogo.boton;
+}

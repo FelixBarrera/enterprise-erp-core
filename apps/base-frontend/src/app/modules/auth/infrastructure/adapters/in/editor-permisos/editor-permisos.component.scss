@@ -1,0 +1,131 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.editor-permisos__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 14px 16px;
+}
+
+.editor-permisos__buscar {
+  flex: 1 1 280px;
+}
+
+.editor-permisos__lupa {
+  margin: 0 4px 0 12px;
+  color: var(--color-texto-tenue);
+}
+
+.editor-permisos__total {
+  color: var(--color-texto-secundario);
+
+  strong {
+    color: var(--color-texto);
+  }
+}
+
+.editor-permisos__grupo {
+  padding: 0;
+  overflow: hidden;
+}
+
+.editor-permisos__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--color-borde-suave);
+  background: var(--color-encabezado-tabla);
+}
+
+// La casilla del grupo, alineada con las de los permisos.
+.editor-permisos__casilla-grupo {
+  margin-left: -8px;
+}
+
+.editor-permisos__titulo {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.editor-permisos__contador--cero {
+  background: var(--estado-neutro-fondo);
+  color: var(--estado-neutro);
+}
+
+.editor-permisos__lista {
+  margin: 0;
+  padding: 4px 8px;
+  list-style: none;
+}
+
+// La casilla con su texto a la izquierda y, a la derecha, «Se agrega» o la nota (aunque el texto
+// ocupe dos líneas en el celular).
+.editor-permisos__permiso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding-right: 8px;
+
+  mat-checkbox {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.editor-permisos__cambio,
+.editor-permisos__nota {
+  flex: none;
+  max-width: 45%;
+  font-size: 14px;
+  text-align: right;
+}
+
+.editor-permisos__cambio {
+  color: var(--estado-aviso);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.editor-permisos__nota {
+  color: var(--color-texto-secundario);
+}
+
+// Solo lectura (el Administrador, o sin permiso de editar): las casillas con su color de siempre,
+// para que se lean bien. El gris queda para «Usted no tiene este permiso».
+:host(.editor-permisos--solo-lectura) {
+  @include mat.checkbox-overrides(
+    (
+      disabled-label-color: var(--color-texto),
+      disabled-selected-icon-color: var(--color-primario),
+      disabled-selected-checkmark-color: #fff,
+      disabled-unselected-icon-color: var(--color-borde-campo),
+    )
+  );
+}
+
+.editor-permisos__vacio {
+  margin: 0;
+  color: var(--color-texto-secundario);
+}
+
+@media (max-width: 599.98px) {
+  .editor-permisos__barra {
+    padding: 12px;
+  }
+
+  .editor-permisos__permiso {
+    min-height: 48px;
+  }
+}

@@ -1,0 +1,23 @@
+@use '../dialogo';
+
+:host {
+  @include dialogo.panel;
+}
+
+.confirmacion__titulo {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.confirmacion__mensaje {
+  margin: 0;
+}
+
+.confirmacion__acciones {
+  @include dialogo.acciones;
+}
+
+.boton {
+  @include dialogo.boton;
+}

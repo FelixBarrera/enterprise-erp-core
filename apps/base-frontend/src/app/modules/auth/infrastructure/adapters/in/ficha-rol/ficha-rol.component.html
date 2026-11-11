@@ -1,0 +1,136 @@
+<app-barra-carga [activa]="carga().estado === 'cargando' || guardando() || cambiandoEstado()" />
+
+@if (falla(); as falla) {
+  <section class="tarjeta ficha-rol__falla" role="alert">
+    <p>{{ falla.mensaje }}</p>
+    @if (falla.reintentar) {
+      <button matButton="outlined" type="button" (click)="cargar()">Reintentar</button>
+    } @else {
+      <a matButton="outlined" routerLink="/roles">Volver a Roles</a>
+    }
+  </section>
+}
+
+@if (carga().estado === 'lista') {
+  @if (rol(); as rol) {
+    <app-encabezado-ficha [titulo]="rol.nombre" volverA="/roles" textoVolver="Roles">
+      <span
+        fichaSimbolo
+        class="ficha-rol__simbolo"
+        [class.ficha-rol__simbolo--administrador]="rol.esAdministrador"
+        aria-hidden="true"
+      >
+        <app-icono nombre="escudo" [tamano]="24" />
+      </span>
+      <span fichaEstado class="estado" [class]="rol.activo ? 'estado--exito' : 'estado--neutro'">
+        {{ rol.activo ? 'Activo' : 'Desactivado' }}
+      </span>
+      <span fichaDetalle>{{ textoUsuarios() }}</span>
+      <!-- Un solo botón en el @if: así lo coloca el encabezado (no anidar otro @if). -->
+      @if (puedeDesactivar()) {
+        <button
+          fichaAcciones
+          matButton="outlined"
+          type="button"
+          [class.boton-peligro]="rol.activo"
+          [disabled]="cambiandoEstado()"
+          [disabledInteractive]="true"
+          (click)="rol.activo ? desactivar() : reactivar()"
+        >
+          <app-icono [nombre]="rol.activo ? 'desactivar' : 'reactivar'" [tamano]="18" />
+          {{ textoBotonEstado() }}
+        </button>
+      }
+    </app-encabezado-ficha>
+
+    @if (rol.esAdministrador) {
+      <p class="ficha-rol__nota">
+        <app-icono nombre="informacion" [tamano]="18" />
+        <span>Tiene todos los permisos y no se puede cambiar.</span>
+      </p>
+    } @else if (!rol.activo) {
+      <p class="ficha-rol__nota ficha-rol__nota--aviso">
+        <app-icono nombre="alerta" [tamano]="18" />
+        <span>Está desactivado: no da sus permisos a quienes lo tienen.</span>
+      </p>
+    }
+
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+      <mat-tab-group
+        class="ficha-rol__pestanas"
+        aria-label="Secciones del rol"
+        animationDuration="0ms"
+        [mat-stretch-tabs]="enCelular()"
+        [(selectedIndex)]="pestana"
+      >
+        <mat-tab label="Datos">
+          <section class="tarjeta ficha-rol__datos" aria-labelledby="rol-datos">
+            <h2 id="rol-datos" class="tarjeta__titulo">Datos del rol</h2>
+            @if (puedeEditar()) {
+              <app-datos-rol [formulario]="formulario" />
+            } @else {
+              <!-- Solo lectura (el Administrador, o sin permiso de editar): los datos como texto. -->
+              <dl class="ficha-rol__solo-lectura">
+                <dt class="etiqueta">Nombre</dt>
+                <dd>{{ rol.nombre }}</dd>
+                <dt class="etiqueta">Descripción</dt>
+                <dd>{{ rol.descripcion ?? '—' }}</dd>
+              </dl>
+            }
+          </section>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            Permisos
+            <span class="ficha-rol__contador-pestana numero">{{ textoPermisos() }}</span>
+          </ng-template>
+          <app-editor-permisos
+            [catalogo]="catalogo()"
+            [(marcados)]="marcados"
+            [originales]="originales()"
+            [editable]="puedeEditar()"
+            [puedeDar]="puedeDar"
+          />
+        </mat-tab>
+      </mat-tab-group>
+
+      @if (cantidadCambios() > 0) {
+        <div class="ficha-rol__cambios" role="region" aria-label="Cambios sin guardar">
+          <div role="alert" class="ficha-rol__error">
+            @if (error(); as mensaje) {
+              <p class="mensaje-error">
+                <app-icono nombre="alerta" [tamano]="18" />
+                <span>{{ mensaje }}</span>
+              </p>
+            }
+          </div>
+          <span class="ficha-rol__texto-cambios">
+            <app-icono nombre="alerta" [tamano]="18" />
+            {{ textoCambios() }}
+          </span>
+          <button matButton="outlined" type="button" (click)="descartar()">Descartar</button>
+          <button
+            matButton="filled"
+            type="submit"
+            [disabled]="guardando()"
+            [disabledInteractive]="true"
+          >
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      }
+    </form>
+
+    <app-pie-ficha [creado]="rol.creado" [modificado]="rol.modificado">
+      <a
+        *appConPermiso="'auditoria.evento.ver'"
+        pieAccion
+        class="enlace pie-ficha__enlace"
+        routerLink="/bitacora"
+        [queryParams]="{ entidad: 'rol', entidadId: rol.id }"
+      >
+        Ver historia
+      </a>
+    </app-pie-ficha>
+  }
+}

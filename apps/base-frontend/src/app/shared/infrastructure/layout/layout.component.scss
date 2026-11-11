@@ -1,0 +1,228 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+// Visible solo al llegar con el teclado (Tab).
+.saltar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: var(--radio);
+  background: var(--color-primario);
+  color: #fff;
+  font: inherit;
+  transform: translateY(-200%);
+
+  &:focus {
+    transform: none;
+  }
+}
+
+.cuerpo {
+  flex: 1;
+  background: var(--color-fondo);
+}
+
+// ── Menú lateral: marca, empresa activa y opciones ──────────────────────────────────────────────
+.menu {
+  width: 264px;
+  border-right: 0;
+  border-radius: 0;
+  background: var(--color-menu);
+  color: var(--color-menu-texto);
+
+  // Sobre el azul oscuro, el foco se dibuja en dorado (el azul de la marca no se vería).
+  :focus-visible {
+    outline-color: var(--color-acento);
+  }
+}
+
+// En la PC, estrecho: una franja con el símbolo, las iniciales de la empresa y los íconos.
+.menu--estrecho {
+  width: 72px;
+
+  .menu__marca {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .menu__empresa {
+    justify-content: center;
+    margin: 16px 12px 4px;
+    padding: 6px;
+  }
+}
+
+.menu__marca {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--color-menu-borde);
+}
+
+.menu__inicio {
+  display: inline-flex;
+  border-radius: var(--radio);
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu__empresa {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 12px 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-menu-borde);
+  border-radius: var(--radio);
+  background: rgb(255 255 255 / 4%);
+}
+
+// Si trabaja en varias empresas, el recuadro es el botón para cambiar.
+.menu__empresa--boton {
+  width: calc(100% - 24px);
+  box-sizing: border-box;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-menu-hover);
+  }
+
+  .menu--estrecho & {
+    width: 48px;
+  }
+}
+
+.menu__empresa-cambiar {
+  margin-left: auto;
+  color: var(--color-menu-titulo);
+}
+
+.menu__empresa-sigla {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--color-acento);
+  color: var(--color-menu);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.menu__empresa-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.menu__empresa-etiqueta {
+  color: var(--color-menu-titulo);
+  font-size: 14px;
+}
+
+.menu__empresa-nombre {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Cabecera ────────────────────────────────────────────────────────────────────────────────────
+.contenido {
+  display: flex;
+  flex-direction: column;
+}
+
+.cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  padding: 0 20px 0 12px;
+  border-bottom: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+
+  @media (max-width: 599.98px) {
+    height: 60px;
+    padding: 0 8px 0 4px;
+  }
+}
+
+.cabecera__menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radio);
+  background: none;
+  color: var(--color-texto);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-fondo);
+  }
+}
+
+.cabecera__marca {
+  display: inline-flex;
+  border-radius: var(--radio);
+  color: inherit;
+  text-decoration: none;
+}
+
+// «Administración › Roles», a continuación del botón del menú.
+.cabecera__migas {
+  margin-left: 8px;
+}
+
+// El menú del usuario (o su botón provisional) va a la derecha.
+.cabecera__fin {
+  margin-left: auto;
+  min-width: 0;
+}
+
+// ── Contenido y pie ─────────────────────────────────────────────────────────────────────────────
+.contenido__principal {
+  flex: 1;
+  width: 100%;
+  max-width: 1440px;
+  box-sizing: border-box;
+  padding: 28px;
+  outline: none;
+
+  @media (max-width: 599.98px) {
+    padding: 20px 16px;
+  }
+}
+
+.pie {
+  padding: 12px 28px;
+  border-top: 1px solid var(--color-borde);
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+
+  @media (max-width: 599.98px) {
+    padding: 12px 16px;
+  }
+}

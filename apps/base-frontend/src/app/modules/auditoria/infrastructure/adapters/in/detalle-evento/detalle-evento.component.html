@@ -1,0 +1,161 @@
+<app-barra-carga [activa]="carga().estado === 'cargando'" />
+
+@if (falla(); as falla) {
+  <section class="tarjeta detalle-evento__falla" role="alert">
+    <p>{{ falla.mensaje }}</p>
+    @if (falla.reintentar) {
+      <button matButton="outlined" type="button" (click)="cargar()">Reintentar</button>
+    } @else {
+      <a matButton="outlined" routerLink="/bitacora">Volver a Bitácora</a>
+    }
+  </section>
+}
+
+@if (carga().estado === 'lista') {
+  @if (evento(); as evento) {
+    <app-encabezado-ficha [titulo]="titulo()" volverA="/bitacora" textoVolver="Bitácora">
+      <span fichaSimbolo class="detalle-evento__simbolo" aria-hidden="true">
+        <app-icono nombre="bitacora" [tamano]="24" />
+      </span>
+      @if (esDeSeguridad(evento.accion)) {
+        <span fichaEstado class="estado estado--peligro">Seguridad</span>
+      }
+      <span fichaDetalle>
+        El <span class="numero">{{ evento.ocurridoEn | fechaHora }}</span>
+        {{ evento.nombreUsuario === null ? 'por el sistema' : 'por ' + evento.nombreUsuario }}
+      </span>
+    </app-encabezado-ficha>
+
+    <div class="detalle-evento__columnas">
+      <section
+        class="tarjeta detalle-evento__cambios"
+        [class.tarjeta--tabla]="!enCelular() && filas().length > 0"
+        aria-labelledby="detalle-titulo-cambios"
+      >
+        <div class="detalle-evento__cabecera">
+          <h2 id="detalle-titulo-cambios" class="tarjeta__titulo">Qué cambió</h2>
+          @if (filas().length > 0 && conAntesYDespues()) {
+            <p class="detalle-evento__ayuda">Solo los datos que cambiaron.</p>
+          }
+        </div>
+
+        @if (filas().length === 0) {
+          <p class="detalle-evento__ayuda">Este evento no cambió datos.</p>
+        } @else if (enCelular()) {
+          <dl class="detalle-evento__filas-celular">
+            @for (fila of filas(); track fila.campo) {
+              <div class="detalle-evento__fila-celular">
+                <dt>{{ fila.dato }}</dt>
+                <dd>
+                  <span class="detalle-evento__lado">Antes</span>
+                  <app-valor-cambio [valor]="fila.antes" />
+                </dd>
+                <dd>
+                  <span class="detalle-evento__lado">Después</span>
+                  <app-valor-cambio [valor]="fila.despues" />
+                </dd>
+              </div>
+            }
+          </dl>
+        } @else {
+          <table class="detalle-evento__tabla">
+            <thead>
+              <tr>
+                <th scope="col" class="detalle-evento__dato">Dato</th>
+                <th scope="col">Antes</th>
+                <th scope="col">Después</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of filas(); track fila.campo) {
+                <tr>
+                  <th scope="row" class="detalle-evento__dato">{{ fila.dato }}</th>
+                  <td><app-valor-cambio [valor]="fila.antes" /></td>
+                  <td><app-valor-cambio [valor]="fila.despues" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+        @if (hayMarcas()) {
+          <p class="detalle-evento__leyenda">
+            <span
+              class="detalle-evento__muestra detalle-evento__muestra--agrega"
+              aria-hidden="true"
+            ></span>
+            Se agregó
+            <span
+              class="detalle-evento__muestra detalle-evento__muestra--quita"
+              aria-hidden="true"
+            ></span>
+            Se quitó
+          </p>
+        }
+      </section>
+
+      <section class="tarjeta detalle-evento__datos" aria-labelledby="detalle-titulo-evento">
+        <h2 id="detalle-titulo-evento" class="tarjeta__titulo">Datos del evento</h2>
+        <dl class="detalle-evento__lista-datos">
+          @if (textoSobreQue(evento); as sobre) {
+            <div>
+              <dt>Sobre qué</dt>
+              <dd>
+                <span>{{ sobre }}</span>
+                @if (ficha() !== null || historia() !== null) {
+                  <span class="detalle-evento__enlaces">
+                    @if (ficha(); as ficha) {
+                      <a class="enlace" [routerLink]="ficha.ruta">Ver su ficha</a>
+                    }
+                    @if (historia(); as historia) {
+                      <a
+                        class="enlace"
+                        [routerLink]="historia.ruta"
+                        [queryParams]="historia.parametros"
+                      >
+                        Ver su historia
+                      </a>
+                    }
+                  </span>
+                }
+              </dd>
+            </div>
+          }
+          <div>
+            <dt>Quién</dt>
+            <dd [class.detalle-evento__tenue]="evento.nombreUsuario === null">
+              {{ textoQuien(evento) }}
+            </dd>
+          </div>
+          <div>
+            <dt>Cuándo</dt>
+            <dd class="numero">{{ evento.ocurridoEn | fechaHora: 'segundos' }}</dd>
+          </div>
+          @if (evento.ip !== null) {
+            <div>
+              <dt>Desde dónde</dt>
+              <dd class="numero">{{ evento.ip }}</dd>
+            </div>
+          }
+          @if (evento.navegador !== null) {
+            <div>
+              <dt>Con qué</dt>
+              <dd class="detalle-evento__largo">{{ evento.navegador }}</dd>
+            </div>
+          }
+          @if (evento.requestId !== null) {
+            <div>
+              <dt>N.º de petición</dt>
+              <dd>
+                <span class="detalle-evento__codigo">{{ evento.requestId }}</span>
+                <span class="detalle-evento__ayuda"
+                  >Para buscarla en los registros del servidor.</span
+                >
+              </dd>
+            </div>
+          }
+        </dl>
+      </section>
+    </div>
+  }
+}

@@ -1,0 +1,26 @@
+# Lo que nunca entra a una imagen de Docker (se construyen desde la raíz del proyecto).
+**/node_modules
+**/dist
+**/coverage
+**/.angular
+**/*.tsbuildinfo
+apps/base-backend/src/generated
+
+# Secretos: cada cliente recibe su .env al instalarse, nunca dentro de la imagen.
+**/.env*
+!**/.env.example
+**/*.p12
+**/*.pem
+
+# No hacen falta para construir
+.git
+.github
+docs
+# De despliegue/ solo entra web/ (la configuración de Nginx); nunca lo de cada servidor.
+despliegue/clientes
+despliegue/sitios
+despliegue/certificados
+despliegue/acme
+despliegue/respaldos
+despliegue/.env
+**/*.log

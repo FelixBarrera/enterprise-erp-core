@@ -1,0 +1,4 @@
+# Cliente generado por Prisma: no se edita ni se formatea.
+src/generated/
+dist/
+coverage/

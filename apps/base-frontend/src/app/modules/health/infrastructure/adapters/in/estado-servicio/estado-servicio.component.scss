@@ -1,0 +1,13 @@
+.estado-servicio {
+  // Alto reservado: nada salta al llegar la respuesta (docs/arquitectura-frontend.md, 8.3).
+  min-height: 1.5rem;
+}
+
+.mensaje {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.mensaje--falla {
+  color: var(--estado-peligro);
+}

@@ -1,0 +1,115 @@
+<button type="button" class="saltar" (click)="irAlContenido()">Saltar al contenido</button>
+
+<mat-sidenav-container #contenedor class="cuerpo" (backdropClick)="cerrarEnCelular()">
+  <mat-sidenav
+    id="menu-principal"
+    class="menu"
+    [class.menu--estrecho]="estrecho()"
+    [mode]="pantallaChica() ? 'over' : 'side'"
+    [opened]="pantallaChica() ? menuAbierto() : true"
+    [disableClose]="true"
+    (keydown.escape)="cerrarEnCelular()"
+  >
+    <div class="menu__marca">
+      <a
+        routerLink="/"
+        class="menu__inicio"
+        [attr.aria-label]="etiquetaInicio"
+        [appEtiquetaLateral]="estrecho() ? 'Inicio' : null"
+        (click)="cerrarEnCelular()"
+      >
+        <app-marca tono="claro" [soloSimbolo]="estrecho()" />
+      </a>
+    </div>
+
+    @if (usuario.nombreEmpresa(); as empresa) {
+      <!-- Estrecho: solo las iniciales; el nombre, al pasar el mouse o con Tab. -->
+      @if (variasEmpresas()) {
+        <button
+          type="button"
+          class="menu__empresa menu__empresa--boton"
+          [attr.aria-label]="'Empresa: ' + empresa + '. Cambiar de empresa'"
+          [appEtiquetaLateral]="estrecho() ? empresa : null"
+          (click)="cambiarEmpresa()"
+        >
+          <span class="menu__empresa-sigla" aria-hidden="true">{{ inicialesEmpresa() }}</span>
+          <span class="menu__empresa-texto" [class.oculto-visual]="estrecho()" aria-hidden="true">
+            <span class="menu__empresa-etiqueta">Empresa</span>
+            <span class="menu__empresa-nombre">{{ empresa }}</span>
+          </span>
+          @if (!estrecho()) {
+            <app-icono nombre="selector" class="menu__empresa-cambiar" [tamano]="18" />
+          }
+        </button>
+      } @else {
+        <div class="menu__empresa" [appEtiquetaLateral]="estrecho() ? empresa : null">
+          <span class="menu__empresa-sigla" aria-hidden="true">{{ inicialesEmpresa() }}</span>
+          <span class="menu__empresa-texto" [class.oculto-visual]="estrecho()">
+            <span class="menu__empresa-etiqueta">Empresa</span>
+            <span class="menu__empresa-nombre">{{ empresa }}</span>
+          </span>
+        </div>
+      }
+    }
+
+    <nav aria-label="Menú principal">
+      <app-menu-lateral
+        [secciones]="menu()"
+        [estrecho]="estrecho()"
+        (elegido)="cerrarEnCelular()"
+      />
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="contenido">
+    <header class="cabecera">
+      <button
+        type="button"
+        class="cabecera__menu"
+        aria-label="Menú"
+        aria-controls="menu-principal"
+        [attr.aria-expanded]="menuAbierto()"
+        (click)="alternarMenu()"
+      >
+        <app-icono nombre="menu" />
+      </button>
+
+      <!-- En la PC la marca está siempre en el menú; en el celular, aquí. -->
+      @if (pantallaChica()) {
+        <a routerLink="/" class="cabecera__marca" [attr.aria-label]="etiquetaInicio">
+          <app-marca />
+        </a>
+      }
+
+      @if (!pantallaChica() && migas().length > 0) {
+        <app-migas class="cabecera__migas" [migas]="migas()" />
+      }
+
+      @if (usuario.nombreCompleto(); as nombre) {
+        <!-- El menú se descarga apenas termina de cargar la página; mientras, el mismo botón. -->
+        @defer (on idle) {
+          <app-menu-usuario class="cabecera__fin" />
+        } @placeholder {
+          <button
+            type="button"
+            class="cabecera__usuario cabecera__fin"
+            aria-disabled="true"
+            [attr.aria-label]="'Menú del usuario: ' + nombre"
+          >
+            <span class="iniciales" aria-hidden="true">{{ inicialesUsuario() }}</span>
+            <span class="cabecera__quien">
+              <span class="cabecera__nombre">{{ nombre }}</span>
+              <span class="cabecera__detalle">{{ detalleUsuario() }}</span>
+            </span>
+            <app-icono nombre="expandir" class="cabecera__flecha" [tamano]="18" />
+          </button>
+        }
+      }
+    </header>
+
+    <main #contenido id="contenido" class="contenido__principal" tabindex="-1">
+      <router-outlet />
+    </main>
+    <footer class="pie">{{ textoPie }}</footer>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,29 @@
+// Módulo auditoria: la bitácora (docs/modulos/auditoria.md).
+// Inmutable: triggers que impiden UPDATE, DELETE y TRUNCATE (migración crear_eventos_auditoria).
+// Sin FK a propósito (AUD-D2): la bitácora no puede impedir nada ni depender de otra tabla.
+// Sin creado_*/actualizado_*: su hora es ocurrido_en y quién es usuario_id (docs/modelo-datos.md).
+
+model EventoAuditoria {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  ocurridoEn    DateTime @map("ocurrido_en") @db.Timestamptz(6)
+  empresaId     String?  @map("empresa_id") @db.Uuid
+  usuarioId     String?  @map("usuario_id") @db.Uuid
+  nombreUsuario String?  @map("nombre_usuario") @db.VarChar(50)
+  accion        String   @db.VarChar(100)
+  entidad       String?  @db.VarChar(60)
+  entidadId     String?  @map("entidad_id") @db.Uuid
+  // Cómo se llamaba el registro en ese momento, para «Sobre qué» (6.12c0b; los de antes, null).
+  entidadNombre String?  @map("entidad_nombre") @db.VarChar(150)
+  antes         Json?
+  despues       Json?
+  ip            String?  @db.VarChar(45)
+  navegador     String?  @db.VarChar(300)
+  requestId     String?  @map("request_id") @db.VarChar(64)
+
+  // Solo los que piden las búsquedas de la pantalla (docs/modulos/auditoria.md, sección 3).
+  @@index([empresaId, ocurridoEn(sort: Desc), id(sort: Desc)], map: "eventos_empresa_ocurrido_idx")
+  @@index([empresaId, entidad, entidadId, ocurridoEn(sort: Desc)], map: "eventos_empresa_entidad_idx")
+  @@index([empresaId, usuarioId, ocurridoEn(sort: Desc)], map: "eventos_empresa_usuario_idx")
+  @@map("eventos")
+  @@schema("auditoria")
+}

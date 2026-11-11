@@ -1,0 +1,257 @@
+:host {
+  display: block;
+}
+
+.ficha-usuario__iniciales {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+}
+
+.ficha-usuario__estados {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ficha-usuario__nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 720px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: var(--radio);
+  background: var(--color-primario-suave);
+  color: var(--color-primario-oscuro);
+  line-height: 1.45;
+
+  app-icono {
+    flex: none;
+    margin-top: 1px;
+  }
+
+  &--aviso {
+    background: var(--estado-aviso-fondo);
+    color: var(--estado-aviso);
+  }
+
+  &--en-pestana {
+    margin-bottom: 14px;
+  }
+}
+
+.ficha-usuario__pestanas {
+  margin-bottom: 16px;
+}
+
+// La cifra al lado de «Roles» y «Sesiones».
+.ficha-usuario__contador-pestana {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--estado-neutro-fondo);
+  color: var(--estado-neutro);
+  font-size: 13px;
+}
+
+.ficha-usuario__datos {
+  max-width: 720px;
+
+  .tarjeta__titulo {
+    margin-bottom: 14px;
+  }
+}
+
+.ficha-usuario__campo {
+  margin-bottom: 14px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.ficha-usuario__solo-lectura {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+
+  dd {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 12px;
+    overflow-wrap: anywhere;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.ficha-usuario__ayuda {
+  color: var(--color-texto-secundario);
+}
+
+// Sesiones: la cabecera como la de la pestaña «Roles», la tabla con su desplazamiento.
+.ficha-usuario__sesiones {
+  max-width: 880px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ficha-usuario__cabecera-sesiones {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-borde-suave);
+  background: var(--color-encabezado-tabla);
+}
+
+.ficha-usuario__titulo-sesiones {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ficha-usuario__sin-sesiones {
+  margin: 0;
+  padding: 16px;
+  color: var(--color-texto-secundario);
+}
+
+.ficha-usuario__tabla {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    min-width: 620px;
+    border-collapse: collapse;
+  }
+
+  th {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-borde);
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-borde-suave);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+// El `User-Agent` completo, en una línea cortada con «…».
+.ficha-usuario__agente {
+  display: block;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ficha-usuario__lista-sesiones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-borde-suave);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+// La barra de cambios: queda a la vista abajo mientras se baja por la ficha.
+.ficha-usuario__cambios {
+  position: sticky;
+  bottom: 16px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-flotante);
+}
+
+.ficha-usuario__error {
+  flex: 1 0 100%;
+
+  &:empty {
+    display: none;
+  }
+
+  .mensaje-error {
+    margin: 0;
+  }
+}
+
+.ficha-usuario__texto-cambios {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  color: var(--estado-aviso);
+  font-weight: 600;
+}
+
+.ficha-usuario__falla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  p {
+    margin: 0;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .ficha-usuario__cambios {
+    bottom: 0;
+    margin-right: -16px;
+    margin-left: -16px;
+    border-radius: 0;
+
+    button {
+      flex: 1 1 auto;
+      min-height: 48px;
+    }
+  }
+
+  .ficha-usuario__texto-cambios {
+    flex-basis: 100%;
+  }
+}
+
+// «Acciones ▾»; en el celular, solo «⋮» en un cuadro de 44 px (como en la maqueta).
+.ficha-usuario__boton-acciones {
+  gap: 6px;
+}
+
+.ficha-usuario__boton-acciones--icono {
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}

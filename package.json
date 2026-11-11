@@ -1,0 +1,26 @@
+{
+  "name": "base-erp",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Base ERP: sistema de gestión",
+  "packageManager": "pnpm@12.10.1",
+  "engines": {
+    "node": "24.21.0",
+    "pnpm": "12.10.1",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev:backend": "pnpm --filter base-backend start:dev",
+    "dev:frontend": "pnpm --filter base-frontend start",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter base-backend test:e2e",
+    "admin:crear-inicial": "pnpm --filter base-backend admin:crear-inicial",
+    "admin:crear-empresa": "pnpm --filter base-backend admin:crear-empresa",
+    "admin:desactivar-empresa": "pnpm --filter base-backend admin:desactivar-empresa",
+    "admin:renombrar-empresa": "pnpm --filter base-backend admin:renombrar-empresa"
+  }
+}

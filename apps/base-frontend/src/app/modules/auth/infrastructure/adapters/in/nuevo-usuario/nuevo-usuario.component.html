@@ -1,0 +1,100 @@
+<app-barra-carga [activa]="carga() === 'cargando' || registrando()" />
+
+<app-encabezado-ficha titulo="Nuevo usuario" volverA="/usuarios" textoVolver="Usuarios">
+  <span fichaDetalle>{{ detalle() }}</span>
+</app-encabezado-ficha>
+
+@if (carga() === 'error') {
+  <section class="tarjeta nuevo-usuario__falla" role="alert">
+    <p>{{ mensajeSinCargar }}</p>
+    <button matButton="outlined" type="button" (click)="cargar()">Reintentar</button>
+  </section>
+} @else if (carga() === 'lista') {
+  <form
+    class="nuevo-usuario"
+    [formGroup]="formulario"
+    (ngSubmit)="registrar()"
+    novalidate
+    [attr.aria-busy]="registrando()"
+  >
+    <section class="tarjeta nuevo-usuario__datos" aria-labelledby="nuevo-usuario-datos">
+      <h2 id="nuevo-usuario-datos" class="tarjeta__titulo">Datos</h2>
+      <div class="nuevo-usuario__campo">
+        <label class="etiqueta" for="nuevo-usuario-usuario">Nombre de usuario</label>
+        <mat-form-field subscriptSizing="dynamic">
+          <input
+            #campoUsuario
+            matInput
+            id="nuevo-usuario-usuario"
+            [formControl]="formulario.controls.nombreUsuario"
+            placeholder="Por ejemplo, lucia.torres"
+            [maxLength]="largoUsuario"
+            autocomplete="sin-autollenado"
+            autocapitalize="none"
+            spellcheck="false"
+          />
+          @if (formulario.controls.nombreUsuario.hasError('obligatorio')) {
+            <mat-error>Escriba el nombre de usuario</mat-error>
+          } @else if (formulario.controls.nombreUsuario.hasError('formato')) {
+            <mat-error>
+              Debe tener de 3 a 50 caracteres: letras sin tildes ni ñ, números, punto, guion o guion
+              bajo
+            </mat-error>
+          } @else {
+            <mat-hint>{{ ayudaUsuario }}</mat-hint>
+          }
+        </mat-form-field>
+      </div>
+      <div class="nuevo-usuario__campo">
+        <label class="etiqueta" for="nuevo-usuario-nombre">Nombre completo</label>
+        <mat-form-field subscriptSizing="dynamic">
+          <input
+            #campoNombre
+            matInput
+            id="nuevo-usuario-nombre"
+            [formControl]="formulario.controls.nombreCompleto"
+            placeholder="Por ejemplo, Lucía Torres"
+            autocomplete="sin-autollenado"
+          />
+          @if (formulario.controls.nombreCompleto.hasError('obligatorio')) {
+            <mat-error>Escriba el nombre completo</mat-error>
+          } @else if (formulario.controls.nombreCompleto.hasError('maxlength')) {
+            <mat-error>Puede tener hasta {{ largoNombre }} caracteres</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </section>
+
+    <app-editor-roles-usuario
+      [asignables]="asignables()"
+      [actuales]="[]"
+      [(marcados)]="marcados"
+      [regla]="regla()"
+      [mostrarCambios]="false"
+      [titulo]="tituloRoles()"
+    />
+
+    <div class="nuevo-usuario__pie">
+      <div role="alert" class="nuevo-usuario__error">
+        @if (error(); as mensaje) {
+          <p class="mensaje-error">
+            <app-icono nombre="alerta" [tamano]="18" />
+            <span>{{ mensaje }}</span>
+          </p>
+        }
+      </div>
+      @if (sinRoles() && error() === null) {
+        <span class="nuevo-usuario__falta">Elija al menos un rol.</span>
+      }
+      <a matButton="outlined" routerLink="/usuarios">Cancelar</a>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="registrando()"
+        [disabledInteractive]="true"
+      >
+        {{ textoBoton() }}
+      </button>
+    </div>
+  </form>
+}

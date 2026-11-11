@@ -1,0 +1,14 @@
+// Esquema de la base de datos.
+// Solo generator y datasource. Los modelos van en prisma/models/<modulo>.prisma
+// (convenciones en docs/modelo-datos.md).
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public", "auditoria", "organizacion", "seguridad"]
+}

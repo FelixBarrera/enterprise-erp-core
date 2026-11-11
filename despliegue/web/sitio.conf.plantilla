@@ -1,0 +1,31 @@
+# Sitio de un cliente. El script de alta lo copia a despliegue/sitios/<cliente>.conf
+# cambiando __DOMINIO__ (su subdominio, ej. cliente1.midominio.com) y __CLIENTE__ (su nombre
+# corto, el mismo del contenedor de su API: <cliente>-api).
+
+server {
+  listen 80;
+  listen [::]:80;
+  server_name __DOMINIO__;
+
+  # Let's Encrypt renueva el certificado por aquí.
+  location /.well-known/acme-challenge/ {
+    root /var/www/acme;
+  }
+
+  location / {
+    return 301 https://$host$request_uri;
+  }
+}
+
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  http2 on;
+  server_name __DOMINIO__;
+
+  ssl_certificate /etc/letsencrypt/live/__DOMINIO__/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/__DOMINIO__/privkey.pem;
+
+  set $api http://__CLIENTE__-api:3000;
+  include /etc/nginx/fragmentos/aplicacion.conf;
+}

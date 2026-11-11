@@ -1,0 +1,23 @@
+// Módulo empresas: las empresas de la instalación (docs/modulos/empresas.md).
+// Varias en la misma base (EMP-D1): toda tabla de negocio apunta aquí con empresa_id.
+// Maestro: se desactiva, nunca se borra (EMP-D9).
+// Escrito a mano en la migración crear_empresas: el único parcial sobre
+// public.nombre_normalizado(nombre) WHERE activo y el CHECK del nombre no vacío.
+
+model Empresa {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  nombre         String   @db.VarChar(150)
+  activo         Boolean  @default(true)
+  creadoEn       DateTime @default(now()) @map("creado_en") @db.Timestamptz(6)
+  creadoPor      String?  @map("creado_por") @db.Uuid
+  actualizadoEn  DateTime @updatedAt @map("actualizado_en") @db.Timestamptz(6)
+  actualizadoPor String?  @map("actualizado_por") @db.Uuid
+
+  // Del lado de auth (las tablas son de ese módulo; Prisma pide las dos puntas).
+  roles                Rol[]
+  usuariosUltimaVisita Usuario[]
+  sesiones             Sesion[]
+
+  @@map("empresas")
+  @@schema("organizacion")
+}

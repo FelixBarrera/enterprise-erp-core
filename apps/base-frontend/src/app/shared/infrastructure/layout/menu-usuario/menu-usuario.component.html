@@ -1,0 +1,60 @@
+@if (usuario.nombreCompleto(); as nombre) {
+  <button
+    type="button"
+    class="cabecera__usuario"
+    [attr.aria-label]="'Menú del usuario: ' + nombre"
+    [matMenuTriggerFor]="menuUsuario"
+    [disabled]="saliendo()"
+  >
+    <span class="iniciales" aria-hidden="true">{{ iniciales() }}</span>
+    <span class="cabecera__quien">
+      <span class="cabecera__nombre">{{ nombre }}</span>
+      <span class="cabecera__detalle">{{ saliendo() ? 'Saliendo…' : detalle() }}</span>
+    </span>
+    <app-icono nombre="expandir" class="cabecera__flecha" [tamano]="18" />
+  </button>
+
+  <mat-menu #menuUsuario="matMenu" xPosition="before" class="menu-usuario">
+    <div class="menu-usuario__quien">
+      <span class="iniciales iniciales--grande" aria-hidden="true">{{ iniciales() }}</span>
+      <span class="menu-usuario__nombres">
+        <span class="menu-usuario__nombre">{{ nombre }}</span>
+        <span class="menu-usuario__cuenta">{{ usuario.nombreUsuario() }}</span>
+      </span>
+    </div>
+    <div class="menu-usuario__empresa">
+      <span class="menu-usuario__etiqueta">Empresa activa</span>
+      <span class="menu-usuario__valor">{{ usuario.nombreEmpresa() }}</span>
+    </div>
+    <div class="menu-usuario__acciones">
+      @if (cuantasEmpresas() > 1) {
+        <button
+          mat-menu-item
+          type="button"
+          class="menu-usuario__cambiar-empresa"
+          [attr.aria-label]="'Cambiar de empresa (' + cuantasEmpresas() + ')'"
+          (click)="cambiarEmpresa()"
+        >
+          <app-icono nombre="empresa" [tamano]="18" />
+          <span class="menu-usuario__texto">Cambiar de empresa</span>
+          <span class="menu-usuario__cuantas" aria-hidden="true">{{ cuantasEmpresas() }}</span>
+        </button>
+      }
+      <button
+        mat-menu-item
+        type="button"
+        class="menu-usuario__cambiar-contrasena"
+        (click)="irACambiarContrasena()"
+      >
+        <app-icono nombre="llave" [tamano]="18" />
+        <span>Cambiar contraseña</span>
+      </button>
+    </div>
+    <div class="menu-usuario__acciones">
+      <button mat-menu-item type="button" class="menu-usuario__salir" (click)="salir()">
+        <app-icono nombre="salir" [tamano]="18" />
+        <span>Salir</span>
+      </button>
+    </div>
+  </mat-menu>
+}

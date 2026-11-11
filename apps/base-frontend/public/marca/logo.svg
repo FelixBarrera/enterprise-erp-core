@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 32" role="img" aria-labelledby="logo-titulo">
+  <!-- Logo PROVISIONAL (por confirmar con el negocio), para fondo claro. En la aplicación se dibuja con <app-marca>. -->
+  <title id="logo-titulo">Base ERP</title>
+  <rect width="32" height="32" rx="8" fill="#0a1a33"/>
+  <rect x="8" y="17.6" width="4" height="7.2" rx="1.2" fill="#fff"/>
+  <rect x="14" y="12.8" width="4" height="12" rx="1.2" fill="#fff"/>
+  <rect x="20" y="7.2" width="4" height="17.6" rx="1.2" fill="#c9a646"/>
+  <text x="42" y="23" fill="#0f172a" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="-0.4">Base<tspan dx="7" dy="-1" fill="#8a6a1f" font-size="13" font-weight="600" letter-spacing="2">ERP</tspan></text>
+</svg>

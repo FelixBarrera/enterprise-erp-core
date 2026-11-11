@@ -1,0 +1,43 @@
+@for (seccion of secciones(); track seccion.id) {
+  <div class="seccion" [class.seccion--estrecha]="estrecho()">
+    <h2 class="seccion__titulo" [hidden]="estrecho()">
+      <button
+        type="button"
+        class="seccion__boton"
+        [attr.aria-expanded]="!cerradas().has(seccion.id)"
+        [attr.aria-controls]="'menu-seccion-' + seccion.id"
+        (click)="alternar(seccion.id)"
+      >
+        <span>{{ seccion.titulo }}</span>
+        <app-icono
+          nombre="expandir"
+          class="seccion__flecha"
+          [class.seccion__flecha--cerrada]="cerradas().has(seccion.id)"
+          [tamano]="20"
+        />
+      </button>
+    </h2>
+    <ul
+      class="seccion__opciones"
+      [id]="'menu-seccion-' + seccion.id"
+      [hidden]="!estrecho() && cerradas().has(seccion.id)"
+    >
+      @for (opcion of seccion.opciones; track opcion.ruta) {
+        <li>
+          <a
+            class="opcion"
+            [routerLink]="opcion.ruta"
+            routerLinkActive="opcion--activa"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: opcion.ruta === '/' }"
+            [appEtiquetaLateral]="estrecho() ? opcion.texto : null"
+            (click)="elegido.emit()"
+          >
+            <app-icono [nombre]="opcion.icono" [tamano]="20" />
+            <span [class.oculto-visual]="estrecho()">{{ opcion.texto }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+}

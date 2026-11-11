@@ -1,0 +1,112 @@
+// Reglas por capas (docs/arquitectura-frontend.md, secciones 1 y 2).
+// OJO: en cada lista de "patterns", el patrón con excepciones ("!...") va SIEMPRE al final:
+// si va antes, oxlint deja de revisar los patrones que siguen.
+// Si dos "overrides" tocan el mismo archivo, gana el último: por eso domain/ y application/
+// repiten la regla de shared/ y van después.
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import"
+  ],
+  "env": {
+    "browser": true
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "coverage/**",
+    ".angular/**"
+  ],
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "error",
+    "no-console": "error",
+    "import/no-cycle": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/app/shared/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "/modules(/|$)",
+                "message": "shared/ no depende de los módulos."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/app/modules/*/domain/**",
+        "src/app/shared/domain/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "/(application|infrastructure)(/|$)",
+                "message": "domain/ no depende de application/ ni de infrastructure/."
+              },
+              {
+                "regex": "/modules(/|$)",
+                "message": "shared/ no depende de los módulos."
+              },
+              {
+                "group": [
+                  "*",
+                  "!./**",
+                  "!../**"
+                ],
+                "message": "domain/ es TypeScript puro: sin Angular, RxJS ni librerías. Solo su dominio y shared/domain/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/app/modules/*/application/**",
+        "src/app/shared/application/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "/infrastructure(/|$)",
+                "message": "application/ no depende de infrastructure/: usar un puerto."
+              },
+              {
+                "regex": "/modules(/|$)",
+                "message": "shared/ no depende de los módulos."
+              },
+              {
+                "group": [
+                  "*",
+                  "!@angular/core",
+                  "!@angular/core/testing",
+                  "!./**",
+                  "!../**"
+                ],
+                "message": "application/ no usa HttpClient, router, formularios, Material, RxJS ni otras librerías (solo @angular/core para inject() e InjectionToken). Lo externo va detrás de un puerto."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

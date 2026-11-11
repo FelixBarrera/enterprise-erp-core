@@ -1,0 +1,122 @@
+# Servicios comunes del servidor: un PostgreSQL, un Redis y un Nginx para todos los clientes.
+# La API de cada cliente va aparte (cliente.compose.yml) y se conecta a la red `erp`.
+#
+#   cd despliegue && docker compose up -d --build
+#
+# Contraseñas en despliegue/.env (copiar de .env.example). Ninguno de los tres se abre a internet
+# salvo Nginx (80 y 443): la base y Redis solo se ven dentro de la red de Docker.
+
+name: servidor
+
+x-registro: &registro
+  # Los logs de Docker sin límite llenan el disco: hasta 5 archivos de 10 MB por servicio.
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '5'
+
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    <<: *registro
+    environment:
+      # Administrador del servidor de base de datos. Solo lo usan los scripts de alta y respaldo;
+      # cada cliente tiene sus propios usuarios.
+      POSTGRES_USER: ${POSTGRES_USUARIO:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_CONTRASENA:?Falta POSTGRES_CONTRASENA en despliegue/.env}
+      TZ: ${ZONA_NEGOCIO:-America/Guayaquil}
+    # pg_stat_statements: qué consultas tardan más (docs/arquitectura-backend.md, sección 17).
+    command: ['postgres', '-c', 'shared_preload_libraries=pg_stat_statements']
+    volumes:
+      - postgres-datos:/var/lib/postgresql
+    networks: [erp]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    <<: *registro
+    environment:
+      REDISCLI_AUTH: ${REDIS_CONTRASENA:?Falta REDIS_CONTRASENA en despliegue/.env}
+    # appendonly: guarda en disco cada cambio. Con contraseña aunque no se vea desde afuera.
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_CONTRASENA}']
+    volumes:
+      - redis-datos:/data
+    networks: [erp]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    image: base-web:${VERSION:-latest}
+    build:
+      context: ..
+      dockerfile: despliegue/web/Dockerfile
+    restart: unless-stopped
+    <<: *registro
+    ports:
+      - '${PUERTO_HTTP:-80}:80'
+      - '${PUERTO_HTTPS:-443}:443'
+    volumes:
+      # Un archivo por cliente, hecho desde web/sitio.conf.plantilla.
+      - ./sitios:/etc/nginx/sitios:ro
+      # Certificados de Let's Encrypt y la carpeta por la que los comprueba.
+      - ./certificados:/etc/letsencrypt:ro
+      - ./acme:/var/www/acme:ro
+    networks: [erp]
+
+  # Let's Encrypt: no queda corriendo; lo usan scripts/alta-cliente.sh (certificado nuevo) y
+  # scripts/renovar-certificados.sh. Deja el archivo de prueba en acme/ (Nginx lo sirve) y el
+  # certificado en certificados/.
+  certbot:
+    image: certbot/certbot:v5.8.0
+    profiles: [certificados]
+    restart: 'no'
+    <<: *registro
+    volumes:
+      - ./certificados:/etc/letsencrypt
+      - ./acme:/var/www/acme
+
+  # Copia cifrada fuera del servidor (restic): no queda corriendo; lo usan
+  # scripts/copia-externa.sh y scripts/probar-restauracion.sh --copia-externa.
+  # Ve la carpeta despliegue/ sin poder cambiarla (copia solo .env, clientes/, sitios/ y el
+  # último respaldo de cada cliente) y usa la configuración de copia-externa/ (destino.env y
+  # clave; docs/despliegue.md, «Copia fuera del servidor»). La carpeta entera y no archivo por
+  # archivo: si uno no existe (un servidor nuevo, sin .env), Docker crearía una carpeta en su lugar.
+  restic:
+    image: restic/restic:0.18.1
+    profiles: [copias]
+    restart: 'no'
+    <<: *registro
+    # Siempre el mismo nombre: así restic sabe que todas las copias son del mismo servidor.
+    hostname: servidor-erp
+    env_file:
+      - path: copia-externa/destino.env
+        required: false
+    environment:
+      RESTIC_PASSWORD_FILE: /despliegue/copia-externa/clave
+      TZ: ${ZONA_NEGOCIO:-America/Guayaquil}
+    volumes:
+      - .:/despliegue:ro
+      # Solo si el destino es una carpeta de este servidor (un disco externo montado).
+      - ${COPIA_EXTERNA_CARPETA:-./copia-externa/carpeta}:/destino
+      # Lo que trae de vuelta (scripts/copia-externa.sh traer, probar-restauracion.sh).
+      - ./copia-externa/traido:/traido
+      - restic-cache:/root/.cache/restic
+
+volumes:
+  postgres-datos:
+  redis-datos:
+  restic-cache:
+
+networks:
+  erp:
+    name: erp

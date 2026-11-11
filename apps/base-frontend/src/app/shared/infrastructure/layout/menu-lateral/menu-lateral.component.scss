@@ -1,0 +1,104 @@
+:host {
+  display: block;
+  padding: 8px 0 16px;
+  color: var(--color-menu-texto);
+}
+
+// Sobre el azul marino, el foco se dibuja en dorado (el azul de la marca no se vería).
+:focus-visible {
+  outline-color: var(--color-acento);
+}
+
+.seccion + .seccion {
+  margin-top: 12px;
+}
+
+// Estrecho: sin títulos, las secciones separadas por una línea.
+.seccion--estrecha + .seccion--estrecha {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-menu-borde);
+}
+
+.seccion--estrecha .opcion {
+  justify-content: center;
+  width: 48px;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.seccion__titulo {
+  margin: 0;
+  font: inherit;
+}
+
+.seccion__boton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 16px 0 24px;
+  border: 0;
+  background: none;
+  color: var(--color-menu-titulo);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-menu-texto);
+  }
+}
+
+.seccion__flecha {
+  transition: transform 150ms ease;
+}
+
+.seccion__flecha--cerrada {
+  transform: rotate(-90deg);
+}
+
+.seccion__opciones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  margin: 2px 12px;
+  padding: 0 12px;
+  border-radius: var(--radio);
+  color: var(--color-menu-opcion);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-menu-hover);
+    color: var(--color-menu-texto);
+  }
+
+  // La opción actual: fondo, letra blanca en negrita y el ícono en dorado (no solo color).
+  &--activa {
+    background: var(--color-menu-activo);
+    color: var(--color-menu-texto);
+    font-weight: 600;
+
+    app-icono {
+      color: var(--color-acento);
+    }
+  }
+
+  // Táctil: 44 px en el celular.
+  @media (max-width: 599.98px) {
+    min-height: 44px;
+  }
+}

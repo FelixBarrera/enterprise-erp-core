@@ -1,0 +1,208 @@
+<app-barra-carga [activa]="listado.cargando()" />
+
+<header class="encabezado-pagina">
+  <div>
+    <h1 class="titulo-pagina">Roles</h1>
+    @if (!enCelular()) {
+      <p class="subtitulo-pagina">
+        Qué puede hacer cada grupo de personas{{ nombreEmpresa() ? ' en ' + nombreEmpresa() : '' }}.
+      </p>
+    }
+  </div>
+  <a *appConPermiso="'auth.rol.crear'" matButton="filled" routerLink="nuevo">
+    <app-icono nombre="agregar" [tamano]="18" />
+    Nuevo rol
+  </a>
+</header>
+
+@if (enCelular()) {
+  <div class="lista-roles__buscador-celular">
+    <mat-form-field subscriptSizing="dynamic" class="lista-roles__buscar">
+      <app-icono matPrefix class="lista-roles__lupa" nombre="buscar" [tamano]="16" />
+      <input
+        matInput
+        type="search"
+        aria-label="Buscar rol"
+        placeholder="Nombre del rol"
+        autocomplete="off"
+        [maxLength]="largoBusqueda"
+        [value]="filtros().texto"
+        (input)="buscar($event)"
+      />
+    </mat-form-field>
+    <button
+      matButton="outlined"
+      type="button"
+      class="lista-roles__boton-filtros"
+      [attr.aria-expanded]="verFiltros()"
+      aria-controls="roles-filtros"
+      [attr.aria-label]="
+        listado.filtrosActivos() > 0
+          ? 'Filtros: ' + listado.filtrosActivos() + ' activo'
+          : 'Filtros'
+      "
+      (click)="alternarFiltros()"
+    >
+      <app-icono nombre="filtros" [tamano]="18" />
+      @if (listado.filtrosActivos() > 0) {
+        <span class="lista-roles__burbuja" aria-hidden="true">{{ listado.filtrosActivos() }}</span>
+      }
+    </button>
+  </div>
+  @if (verFiltros()) {
+    <section id="roles-filtros" class="tarjeta lista-roles__filtros-celular" aria-label="Filtros">
+      <ng-container [ngTemplateOutlet]="filtroEstado" />
+      @if (listado.filtrosActivos() > 0) {
+        <button matButton type="button" (click)="listado.limpiarFiltros()">Limpiar filtros</button>
+      }
+    </section>
+  }
+
+  <ul class="lista-tarjetas" aria-label="Lista de roles">
+    @for (rol of roles(); track rol.id) {
+      <li>
+        <a class="tarjeta-fila" [routerLink]="[rol.id]">
+          <span class="tarjeta-fila__cuerpo">
+            <span class="tarjeta-fila__titulo">
+              {{ rol.nombre }}
+              <span class="estado" [class]="rol.activo ? 'estado--exito' : 'estado--neutro'">
+                {{ rol.activo ? 'Activo' : 'Desactivado' }}
+              </span>
+            </span>
+            @if (rol.descripcion) {
+              <span class="tarjeta-fila__secundario">{{ rol.descripcion }}</span>
+            }
+            <span class="tarjeta-fila__secundario numero">{{ cifras(rol) }}</span>
+          </span>
+          <app-icono nombre="siguiente" [tamano]="18" />
+        </a>
+      </li>
+    }
+  </ul>
+  <app-estado-lista
+    [listado]="listado"
+    vacio="No hay roles."
+    vacioConFiltros="Ningún rol coincide con los filtros."
+  />
+  <app-paginador [listado]="listado" />
+} @else {
+  <section class="tarjeta lista-roles__filtros" aria-labelledby="roles-titulo-filtros">
+    <div class="tarjeta__cabecera">
+      <div class="lista-roles__titulo-filtros">
+        <h2 id="roles-titulo-filtros" class="tarjeta__titulo">Filtros</h2>
+        @if (listado.filtrosActivos() > 0) {
+          <span class="contador">
+            {{ listado.filtrosActivos() }}
+            {{ listado.filtrosActivos() === 1 ? 'activo' : 'activos' }}
+          </span>
+        }
+      </div>
+    </div>
+    <div class="lista-roles__campos">
+      <div class="lista-roles__campo-buscar">
+        <label class="etiqueta" for="roles-buscar">Buscar</label>
+        <mat-form-field subscriptSizing="dynamic">
+          <app-icono matPrefix class="lista-roles__lupa" nombre="buscar" [tamano]="16" />
+          <input
+            matInput
+            id="roles-buscar"
+            type="search"
+            placeholder="Nombre del rol"
+            autocomplete="off"
+            [maxLength]="largoBusqueda"
+            [value]="filtros().texto"
+            (input)="buscar($event)"
+          />
+        </mat-form-field>
+      </div>
+      <ng-container [ngTemplateOutlet]="filtroEstado" />
+      @if (listado.filtrosActivos() > 0) {
+        <button matButton type="button" (click)="listado.limpiarFiltros()">Limpiar filtros</button>
+      }
+    </div>
+  </section>
+
+  <section class="tarjeta tarjeta--tabla" aria-label="Lista de roles">
+    <table mat-table [dataSource]="roles()">
+      <ng-container matColumnDef="rol">
+        <th mat-header-cell *matHeaderCellDef>Rol</th>
+        <td mat-cell *matCellDef="let rol">
+          <span class="lista-roles__rol">
+            <span
+              class="lista-roles__simbolo"
+              [class.lista-roles__simbolo--administrador]="rol.esAdministrador"
+              aria-hidden="true"
+            >
+              <app-icono nombre="escudo" [tamano]="18" />
+            </span>
+            <span class="celda-doble">
+              <a class="lista-roles__nombre" [routerLink]="[rol.id]">{{ rol.nombre }}</a>
+              @if (rol.descripcion) {
+                <span class="celda-doble__secundario">{{ rol.descripcion }}</span>
+              }
+            </span>
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="permisos">
+        <th mat-header-cell *matHeaderCellDef class="alinear-derecha">Permisos</th>
+        <td mat-cell *matCellDef="let rol" class="alinear-derecha numero">
+          {{ textoPermisos(rol) }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="usuarios">
+        <th mat-header-cell *matHeaderCellDef class="alinear-derecha">Usuarios</th>
+        <td mat-cell *matCellDef="let rol" class="alinear-derecha numero">
+          {{ rol.cantidadUsuarios }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let rol">
+          <span class="estado" [class]="rol.activo ? 'estado--exito' : 'estado--neutro'">
+            {{ rol.activo ? 'Activo' : 'Desactivado' }}
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="abrir">
+        <th mat-header-cell *matHeaderCellDef class="lista-roles__abrir">
+          <span class="oculto-visual">Abrir</span>
+        </th>
+        <td mat-cell *matCellDef="let rol" class="lista-roles__abrir">
+          <app-icono nombre="siguiente" [tamano]="18" />
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let rol; columns: columnas"
+        class="lista-roles__fila"
+        (click)="abrir(rol, $event)"
+      ></tr>
+    </table>
+    <app-estado-lista
+      [listado]="listado"
+      vacio="No hay roles."
+      vacioConFiltros="Ningún rol coincide con los filtros."
+    />
+    <app-paginador [listado]="listado" />
+  </section>
+}
+
+<ng-template #filtroEstado>
+  <div class="lista-roles__campo-estado">
+    <label class="etiqueta" id="roles-estado-etiqueta" for="roles-estado">Estado</label>
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-select
+        id="roles-estado"
+        aria-labelledby="roles-estado-etiqueta"
+        [value]="filtros().estado"
+        (selectionChange)="elegirEstado($event.value)"
+      >
+        @for (opcion of opcionesEstado; track opcion.valor) {
+          <mat-option [value]="opcion.valor">{{ opcion.texto }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</ng-template>

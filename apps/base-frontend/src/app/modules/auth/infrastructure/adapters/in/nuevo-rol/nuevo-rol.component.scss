@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+.nuevo-rol__pestanas {
+  margin-bottom: 16px;
+}
+
+.nuevo-rol__contador-pestana {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--estado-neutro-fondo);
+  color: var(--estado-neutro);
+  font-size: 13px;
+}
+
+.nuevo-rol__datos {
+  max-width: 720px;
+
+  .tarjeta__titulo {
+    margin-bottom: 14px;
+  }
+}
+
+// El error y los botones: a la vista abajo, también desde «Permisos» (que es larga).
+.nuevo-rol__pie {
+  position: sticky;
+  bottom: 16px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-flotante);
+}
+
+.nuevo-rol__error {
+  flex: 1 0 100%;
+
+  &:empty {
+    display: none;
+  }
+
+  .mensaje-error {
+    margin: 0;
+  }
+}
+
+.nuevo-rol__falla {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  p {
+    margin: 0;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .nuevo-rol__pie {
+    bottom: 0;
+    margin-right: -16px;
+    margin-left: -16px;
+    border-radius: 0;
+
+    a,
+    button {
+      flex: 1 1 auto;
+      min-height: 48px;
+    }
+  }
+}

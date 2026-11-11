@@ -1,0 +1,284 @@
+<app-barra-carga [activa]="carga().estado === 'cargando' || guardando() || enCurso() !== null" />
+
+@if (falla(); as falla) {
+  <section class="tarjeta ficha-usuario__falla" role="alert">
+    <p>{{ falla.mensaje }}</p>
+    @if (falla.reintentar) {
+      <button matButton="outlined" type="button" (click)="cargar()">Reintentar</button>
+    } @else {
+      <a matButton="outlined" routerLink="/usuarios">Volver a Usuarios</a>
+    }
+  </section>
+}
+
+@if (carga().estado === 'lista') {
+  @if (usuario(); as usuario) {
+    <app-encabezado-ficha
+      [titulo]="usuario.nombreCompleto"
+      volverA="/usuarios"
+      textoVolver="Usuarios"
+      [accionesEnLinea]="enCelular()"
+    >
+      <span fichaSimbolo class="iniciales ficha-usuario__iniciales" aria-hidden="true">{{
+        simbolo()
+      }}</span>
+      <span fichaEstado class="ficha-usuario__estados">
+        @for (estado of estados(); track estado.texto) {
+          <span class="estado" [class]="'estado--' + estado.tipo">{{ estado.texto }}</span>
+        }
+      </span>
+      <span fichaDetalle>
+        {{ usuario.nombreUsuario }} ·
+        @if (usuario.ultimoIngresoEn) {
+          Último ingreso el <span class="numero">{{ usuario.ultimoIngresoEn | fechaHora }}</span>
+        } @else {
+          {{ sinIngreso }}
+        }
+      </span>
+      <!-- Un solo botón en el @if: así lo coloca el encabezado (no anidar otro @if). -->
+      @if (acciones().hay) {
+        <button
+          fichaAcciones
+          matButton="outlined"
+          type="button"
+          class="ficha-usuario__boton-acciones"
+          [class.ficha-usuario__boton-acciones--icono]="enCelular() && enCurso() === null"
+          [attr.aria-label]="enCelular() ? textoMenu() : null"
+          [matMenuTriggerFor]="menuAcciones"
+          [disabled]="enCurso() !== null"
+          [disabledInteractive]="true"
+        >
+          @if (enCelular() && enCurso() === null) {
+            <app-icono nombre="mas" [tamano]="20" />
+          } @else {
+            {{ textoMenu() }}
+            <app-icono nombre="expandir" [tamano]="18" />
+          }
+        </button>
+      }
+    </app-encabezado-ficha>
+
+    <mat-menu #menuAcciones="matMenu" xPosition="before" class="menu-acciones">
+      @for (accion of acciones().comunes; track accion) {
+        <button mat-menu-item type="button" (click)="ejecutar(accion)">
+          <app-icono [nombre]="verAccion(accion).icono" [tamano]="18" />
+          <span>{{ verAccion(accion).texto }}</span>
+        </button>
+      }
+      @if (acciones().comunes.length > 0 && acciones().peligro.length > 0) {
+        <div class="menu-acciones__separador" role="separator"></div>
+      }
+      @for (accion of acciones().peligro; track accion) {
+        <button
+          mat-menu-item
+          type="button"
+          class="menu-acciones__peligro"
+          (click)="ejecutar(accion)"
+        >
+          <app-icono [nombre]="verAccion(accion).icono" [tamano]="18" />
+          <span>{{ verAccion(accion).texto }}</span>
+        </button>
+      }
+    </mat-menu>
+
+    @if (esSuFicha()) {
+      <p class="ficha-usuario__nota">
+        <app-icono nombre="informacion" [tamano]="18" />
+        <span
+          >Es su usuario: no puede cambiar sus propios roles, quitarse el acceso ni desactivarse. Su
+          contraseña, con «Cambiar contraseña» en el menú de arriba.</span
+        >
+      </p>
+    } @else if (!usuario.activo) {
+      <p class="ficha-usuario__nota ficha-usuario__nota--aviso">
+        <app-icono nombre="alerta" [tamano]="18" />
+        <span>Está desactivado: no entra en ninguna empresa.</span>
+      </p>
+    }
+
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+      <mat-tab-group
+        class="ficha-usuario__pestanas"
+        aria-label="Secciones del usuario"
+        animationDuration="0ms"
+        [mat-stretch-tabs]="enCelular()"
+        [(selectedIndex)]="pestana"
+      >
+        <mat-tab label="Datos">
+          <div class="ficha-usuario__datos">
+            @if (usuario.trabajaEnOtrasEmpresas && puedeEditarNombre()) {
+              <p class="ficha-usuario__nota ficha-usuario__nota--en-pestana">
+                <app-icono nombre="informacion" [tamano]="18" />
+                <span>
+                  También trabaja en otra empresa. Su nombre solo lo puede cambiar quien lo
+                  administra en todas.
+                </span>
+              </p>
+            }
+            <section class="tarjeta" aria-labelledby="usuario-datos">
+              <h2 id="usuario-datos" class="tarjeta__titulo">Datos del usuario</h2>
+              @if (puedeEditarNombre()) {
+                <div class="ficha-usuario__campo">
+                  <label class="etiqueta" for="usuario-nombre">Nombre completo</label>
+                  <mat-form-field subscriptSizing="dynamic">
+                    <input
+                      #campoNombre
+                      matInput
+                      id="usuario-nombre"
+                      [formControl]="nombre"
+                      autocomplete="sin-autollenado"
+                    />
+                    @if (nombre.hasError('obligatorio')) {
+                      <mat-error>Escriba el nombre completo</mat-error>
+                    } @else if (nombre.hasError('maxlength')) {
+                      <mat-error>Puede tener hasta {{ largoNombre }} caracteres</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              }
+              <dl class="ficha-usuario__solo-lectura">
+                @if (!puedeEditarNombre()) {
+                  <dt class="etiqueta">Nombre completo</dt>
+                  <dd>{{ usuario.nombreCompleto }}</dd>
+                }
+                <dt class="etiqueta">Nombre de usuario</dt>
+                <dd>
+                  <span class="numero">{{ usuario.nombreUsuario }}</span>
+                  <span class="ficha-usuario__ayuda"
+                    >Con este nombre entra. No se puede cambiar.</span
+                  >
+                </dd>
+              </dl>
+            </section>
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            Roles
+            <span class="ficha-usuario__contador-pestana numero">{{ marcados().size }}</span>
+          </ng-template>
+          <app-editor-roles-usuario
+            [asignables]="asignables()"
+            [actuales]="usuario.roles"
+            [(marcados)]="marcados"
+            [regla]="regla()"
+            [titulo]="tituloRoles()"
+          />
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            Sesiones
+            <span class="ficha-usuario__contador-pestana numero">{{
+              usuario.sesiones.length
+            }}</span>
+          </ng-template>
+          <section class="tarjeta ficha-usuario__sesiones" aria-labelledby="usuario-sesiones">
+            <div class="ficha-usuario__cabecera-sesiones">
+              <h2 id="usuario-sesiones" class="ficha-usuario__titulo-sesiones">
+                Sesiones abiertas en esta empresa
+              </h2>
+              <span class="ficha-usuario__ayuda">
+                Los equipos donde tiene la sesión abierta ahora. La usada más hace poco va primero.
+              </span>
+            </div>
+            @if (usuario.sesiones.length === 0) {
+              <p class="ficha-usuario__sin-sesiones">No tiene sesiones abiertas en esta empresa.</p>
+            } @else if (enCelular()) {
+              <ul class="ficha-usuario__lista-sesiones">
+                @for (s of usuario.sesiones; track s.id) {
+                  <li>
+                    <strong>{{ navegador(s.navegador) }}</strong>
+                    <span class="ficha-usuario__ayuda numero">{{ s.ip ?? '—' }}</span>
+                    <span class="ficha-usuario__ayuda">
+                      Entró el <span class="numero">{{ s.iniciadaEn | fechaHora }}</span> · último
+                      uso el <span class="numero">{{ s.ultimoUsoEn | fechaHora }}</span>
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="ficha-usuario__tabla">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Equipo</th>
+                      <th scope="col">Dirección IP</th>
+                      <th scope="col">Entró</th>
+                      <th scope="col">Último uso</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (s of usuario.sesiones; track s.id) {
+                      <tr>
+                        <td>
+                          <span class="celda-doble">
+                            <strong>{{ navegador(s.navegador) }}</strong>
+                            @if (s.navegador) {
+                              <span class="celda-doble__secundario ficha-usuario__agente">{{
+                                s.navegador
+                              }}</span>
+                            }
+                          </span>
+                        </td>
+                        <td class="numero">{{ s.ip ?? '—' }}</td>
+                        <td class="numero">{{ s.iniciadaEn | fechaHora }}</td>
+                        <td class="numero">{{ s.ultimoUsoEn | fechaHora }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </section>
+        </mat-tab>
+      </mat-tab-group>
+
+      @if (cantidadCambios() > 0) {
+        <div class="ficha-usuario__cambios" role="region" aria-label="Cambios sin guardar">
+          <div role="alert" class="ficha-usuario__error">
+            @if (error(); as mensaje) {
+              <p class="mensaje-error">
+                <app-icono nombre="alerta" [tamano]="18" />
+                <span>{{ mensaje }}</span>
+              </p>
+            } @else if (sinRoles()) {
+              <p class="mensaje-error">
+                <app-icono nombre="alerta" [tamano]="18" />
+                <span>{{ mensajeSinRoles }}</span>
+              </p>
+            }
+          </div>
+          <span class="ficha-usuario__texto-cambios">
+            <app-icono nombre="alerta" [tamano]="18" />
+            {{ textoCambios() }}
+          </span>
+          <button matButton="outlined" type="button" (click)="descartar()">Descartar</button>
+          <button
+            matButton="filled"
+            type="submit"
+            [disabled]="guardando() || sinRoles()"
+            [disabledInteractive]="true"
+          >
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      }
+    </form>
+
+    <app-pie-ficha
+      [creado]="usuario.creado"
+      [modificado]="usuario.modificado"
+      textoCreado="Con acceso desde el"
+    >
+      <a
+        *appConPermiso="'auditoria.evento.ver'"
+        pieAccion
+        class="enlace pie-ficha__enlace"
+        routerLink="/bitacora"
+        [queryParams]="{ entidad: 'usuario', entidadId: usuario.id }"
+      >
+        Ver historia
+      </a>
+    </app-pie-ficha>
+  }
+}

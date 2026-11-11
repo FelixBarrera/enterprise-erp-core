@@ -1,0 +1,75 @@
+<div class="tarjeta editor-permisos__barra">
+  <mat-form-field subscriptSizing="dynamic" class="editor-permisos__buscar">
+    <app-icono matPrefix class="editor-permisos__lupa" nombre="buscar" [tamano]="16" />
+    <input
+      matInput
+      type="search"
+      aria-label="Buscar permiso"
+      placeholder="Buscar permiso"
+      autocomplete="off"
+      maxlength="80"
+      [value]="texto()"
+      (input)="buscar($event)"
+    />
+  </mat-form-field>
+  <mat-slide-toggle
+    [checked]="soloMarcados()"
+    [hideIcon]="true"
+    (change)="soloMarcados.set($event.checked)"
+  >
+    Solo los marcados
+  </mat-slide-toggle>
+  <span class="editor-permisos__total numero" aria-live="polite">
+    <strong>{{ cantidadMarcados() }}</strong> de {{ total() }} marcados
+  </span>
+</div>
+
+@for (g of grupos(); track g.grupo.modulo) {
+  <section
+    class="tarjeta editor-permisos__grupo"
+    [attr.aria-labelledby]="'permisos-' + g.grupo.modulo"
+  >
+    <div class="editor-permisos__cabecera">
+      @if (editable()) {
+        <mat-checkbox
+          class="editor-permisos__casilla-grupo"
+          [checked]="g.marca === 'todo'"
+          [indeterminate]="g.marca === 'parcial'"
+          [disabled]="!g.cambiable"
+          [aria-label]="'Marcar todo el grupo ' + g.grupo.nombre"
+          (change)="alternarGrupo(g.grupo)"
+        />
+      }
+      <h3 class="editor-permisos__titulo" [id]="'permisos-' + g.grupo.modulo">
+        {{ g.grupo.nombre }}
+      </h3>
+      <span class="contador" [class.editor-permisos__contador--cero]="g.marcados === 0">
+        {{ g.contador }}
+      </span>
+    </div>
+    <ul class="editor-permisos__lista">
+      @for (p of g.permisos; track p.codigo) {
+        <li class="editor-permisos__permiso">
+          <mat-checkbox
+            [checked]="p.marcado"
+            [disabled]="!p.cambiable"
+            (change)="alternar(p.codigo)"
+          >
+            {{ p.descripcion }}
+          </mat-checkbox>
+          @if (p.cambio === 'agrega') {
+            <span class="editor-permisos__cambio">Se agrega</span>
+          } @else if (p.cambio === 'quita') {
+            <span class="editor-permisos__cambio">Se quita</span>
+          } @else if (editable() && !p.cambiable) {
+            <span class="editor-permisos__nota">Usted no tiene este permiso</span>
+          }
+        </li>
+      }
+    </ul>
+  </section>
+} @empty {
+  <p class="tarjeta editor-permisos__vacio">
+    {{ hayFiltro() ? 'Ningún permiso coincide con la búsqueda.' : 'No hay permisos.' }}
+  </p>
+}
