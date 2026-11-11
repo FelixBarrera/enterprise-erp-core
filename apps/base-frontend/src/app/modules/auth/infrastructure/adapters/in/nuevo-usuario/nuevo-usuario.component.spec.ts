@@ -25,6 +25,7 @@ function errorHttp(tipo: TipoErrorHttp, mensaje: string, estado: number, avisado
 interface Opciones {
   asignables?: () => Promise<RolAsignable[]>;
   esAdministrador?: boolean;
+  empresa?: string;
 }
 
 async function montar(opciones: Opciones = {}) {
@@ -63,7 +64,10 @@ async function montar(opciones: Opciones = {}) {
           sesion: signal(sesionDePrueba({ esAdministrador: opciones.esAdministrador ?? false })),
         },
       },
-      { provide: USUARIO_CABECERA, useValue: { nombreEmpresa: signal('Comercial Ejemplo') } },
+      {
+        provide: USUARIO_CABECERA,
+        useValue: { nombreEmpresa: signal(opciones.empresa ?? 'Comercial Ejemplo') },
+      },
     ],
   });
   const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
@@ -114,6 +118,12 @@ async function montar(opciones: Opciones = {}) {
 }
 
 describe('NuevoUsuarioComponent', () => {
+  it('una empresa cuyo nombre termina en punto no deja dos puntos seguidos', async () => {
+    const { texto } = await montar({ empresa: 'Comercial Ejemplo S.A.' });
+    expect(texto()).toContain('al menos un rol en Comercial Ejemplo S.A.');
+    expect(texto()).not.toContain('S.A..');
+  });
+
   it('una persona nueva: los dos campos y los roles de la empresa, sin elegir a alguien existente', async () => {
     const { texto, campo, html } = await montar();
     expect(texto()).toContain('Nuevo usuario');

@@ -28,7 +28,11 @@ function pagina(elementos: RolResumen[]): Pagina<RolResumen> {
   return { elementos, total: elementos.length, pagina: 1, tamano: 20 };
 }
 
-async function montar(url = '/roles', permisos = ['auth.rol.ver', 'auth.rol.crear']) {
+async function montar(
+  url = '/roles',
+  permisos = ['auth.rol.ver', 'auth.rol.crear'],
+  empresa = 'Comercial Ejemplo',
+) {
   const listar = vi.fn((_f: FiltrosRoles, _p: PedidoPagina) => Promise.resolve(pagina(ROLES)));
   TestBed.configureTestingModule({
     providers: [
@@ -39,7 +43,7 @@ async function montar(url = '/roles', permisos = ['auth.rol.ver', 'auth.rol.crea
       ]),
       { provide: CONSULTAR_ROLES_PORT, useValue: { listar, ver: vi.fn() } },
       { provide: PERMISOS_SESION, useValue: new PermisosDePrueba(permisos) },
-      { provide: USUARIO_CABECERA, useValue: { nombreEmpresa: signal('Comercial Ejemplo') } },
+      { provide: USUARIO_CABECERA, useValue: { nombreEmpresa: signal(empresa) } },
     ],
   });
   const harness = await RouterTestingHarness.create();
@@ -57,6 +61,12 @@ describe('ListaRolesComponent', () => {
     TestBed.resetTestingModule();
     const sinPermiso = await montar('/roles', ['auth.rol.ver']);
     expect(sinPermiso.html.querySelector('a[href="/roles/nuevo"]')).toBeNull();
+  });
+
+  it('una empresa cuyo nombre termina en punto no deja dos puntos seguidos', async () => {
+    const { texto } = await montar('/roles', ['auth.rol.ver'], 'Comercial Ejemplo S.A.');
+    expect(texto()).toContain('grupo de personas en Comercial Ejemplo S.A. ');
+    expect(texto()).not.toContain('S.A..');
   });
 
   it('pide la primera página sin filtros y muestra los roles', async () => {
